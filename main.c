@@ -6,51 +6,54 @@
 
 //ADC-Funktionen:
 
-extern void adc_init(void);
-extern unsigned int adc_in(unsigned char kanal);
+		extern void adc_init(void);
+		extern unsigned int adc_in(unsigned char kanal);
 
 // LCD Funktionen
-   extern void lcd_init(void);		      // Init LCD
-   extern void lcd_clr(void);	 	     	  // LCD Löschen 
-   extern void lcd_byte(char);  	     	// Ausgabe unsigned char  => 3 stellig
-   extern void lcd_str(char *ptr);	    // Ausgabe String
-   extern void lcd_curs(char);		      // Cursor setzen
-   extern void asc_out(char);	   		    // Ausgabe eines ASCII Zeichens
-   extern void lcd_int(unsigned int);	  // Ausgabe Int Wert => 4 stellig
+		extern void lcd_init(void);		      // Init LCD
+		extern void lcd_clr(void);	 	     	// LCD Löschen 
+		extern void lcd_byte(char);  	     	// Ausgabe unsigned char  => 3 stellig
+		extern void lcd_str(char *ptr);	    // Ausgabe String
+		extern void lcd_curs(char);		      // Cursor setzen
+		extern void asc_out(char);	   		  // Ausgabe eines ASCII Zeichens
+		extern void lcd_int(unsigned int);	// Ausgabe Int Wert => 4 stellig
 	 
 // Texte
-unsigned char Waus[]="Waschmaschine Aus";   	// LCD-Text Waschmaschine Aus
-unsigned char Wan[]="Waschmaschine An";   	  // LCD-Text Waschmaschine An
-unsigned char WS3[]="Wasserzulauf bis S3";   // LCD-Text Wasserzulauf bis S3
-unsigned char Han[]="Heizung An";   	        // LCD-Text Heizung An
-unsigned char Man[]="Motor An";   	          // LCD-Text Motor An
+		unsigned char Waus[]="Waschmaschine Aus";   	// LCD-Text Waschmaschine Aus
+		unsigned char Wan[]="Waschmaschine An";   	  // LCD-Text Waschmaschine An
+		unsigned char WS3[]="Wasserzulauf bis S3";    // LCD-Text Wasserzulauf bis S3
+		unsigned char Han[]="Heizung An";   	        // LCD-Text Heizung An
+		unsigned char Man[]="Motor An";   	          // LCD-Text Motor An
 
 //Eigene Funktionen:
 
-void init (void);
-void zyklus1 (void);
-void zyklus2 (void);
-void teiler (void);							// Teilen in einzelne Ziffer
-void print (void);							// Temperatur darstellen
+		void init (void);
+		void zyklus1 (void);
+		void zyklus2 (void);
+		void teiler (void);							// Teilen in einzelne Ziffer
+		void print (void);							// Temperatur darstellen
+		void warten (void);							// 5.461 msec. 
 
 //Variablen:
 
-sbit S1 = P0_DATA^5;    // (Schalter)Hauptschalter - Interruptbetrieb EXT0
-sbit S2 = P3_DATA^1;    // (Sensor)Temperatur Schalter
-sbit S3 = P3_DATA^2;    // (Sensor)Fühlstand erreicht
-sbit S4 = P3_DATA^3;    // (Sensor)Füllstand überschritten
-sbit S5 = P3_DATA^4;    // (Signal) benutzer Anwahl 60 grad
-sbit S6 = P3_DATA^5;    // (Signal) benutzer Anwahl 90 grad
+		sbit S1 = P0_DATA^5;    // (Schalter)Hauptschalter - Interruptbetrieb EXT0
+		sbit S2 = P3_DATA^1;    // (Sensor)Temperatur Schalter
+		sbit S3 = P3_DATA^2;    // (Sensor)Fühlstand erreicht
+		sbit S4 = P3_DATA^3;    // (Sensor)Füllstand überschritten
+		sbit S5 = P3_DATA^4;    // (Signal) benutzer Anwahl 60 grad
+		sbit S6 = P3_DATA^5;    // (Signal) benutzer Anwahl 90 grad
 
-unsigned int Y;         // (Steuersignal) Wasserzulauf
-unsigned int H;         // (Steuersignal) Heizung
-unsigned int M;         // (Steuersignal) Motor
-unsigned int start;			// (Steuersignal) Start
+		unsigned int Y;         // (Steuersignal) Wasserzulauf
+		unsigned int H;         // (Steuersignal) Heizung
+		unsigned int M;         // (Steuersignal) Motor
+		unsigned int start;			// (Steuersignal) Start
+		unsigned int p; 
 
-unsigned long temperatur_8;				//temperatur 8_bit
-unsigned long temperatur_10;			//temperatur 10_bit
-unsigned long temperatur_500;			//temperatur 0-50,0°C
-unsigned int H, Z, E, temperatur;	// Speicher für H,Z,E
+
+		unsigned int temperatur_8;				// Temperatur 8_bit
+		unsigned int temperatur_10;			  // Temperatur 10_bit
+		unsigned int temperatur_500;			// Temperatur 0-50,0°C
+		unsigned int H, Z, E, temperatur;	// Speicher für H,Z,E
 
 //(Main)*****
 
@@ -128,8 +131,8 @@ void zyklus1 (void)
 
 void init (void)
 {
-	lcd_init();														// Initiierung des Bildschirms
-	lcd_clr();														// Löschen des Bildschirms
+	lcd_init();			// Initiierung des Bildschirms
+	lcd_clr();			// Löschen des Bildschirms
 	
 	P0_DIR = 0x18;	// P0.5 als Eingang, P0.4 und P0.3 als Ausgang
 	P1_DIR = 0xFF;
@@ -141,7 +144,13 @@ void init (void)
 	
 	TMOD = 0x11;      // Timer 0 initialisiert
 	
-	adc_init();										// ADC initialisieren
+	adc_init();				// ADC initialisieren
+	
+	//Interrupt
+//	EXICON0=0xFF;
+//	IT0=1;
+	EX0 = 1;					//Ext. 0 Freigabe
+	EA = 1; 					// Globale Freigabe
 }
 
 void teiler (void)
@@ -158,13 +167,36 @@ void teiler (void)
 void print (void)
 {
 	teiler ();
-	lcd_curs(1);				// Cursor auf Position 1 setzen
+	lcd_curs(1);							// Cursor auf Position 1 setzen
 	lcd_str("Temperatur: ");
-	asc_out(0x30 + H);	// Ausgabe H
-	asc_out(0x30 + Z);	// Ausgabe Z
+	asc_out(0x30 + H);				// Ausgabe H
+	asc_out(0x30 + Z);				// Ausgabe Z
 	lcd_str(",");
-	asc_out(0x30 + E);	// Ausgabe E
+	asc_out(0x30 + E);				// Ausgabe E
 	lcd_str("°C");
 	lcd_str("Start : ");
 	asc_out(0x30 + start);
+}
+
+void warten (void)
+{
+	TF0 = 0;								//Timer-Flag auf 0 - bitaddresiert
+	TL0 = 0x00;							//Erste 8-binare - bitadresiert (start)
+	TH0 = 0x00;							//Zweite 8-binare - bitadresiert
+	TR0 = 1;								//Timer 0 starten - bitadresiert 
+	while (TF0 == 0);
+	TR0 = 0;								//Timer 0 stoppt - bitadressiert
+}
+
+void interrupt_switch_0 (void) interrupt 0
+{
+	P1_DATA = 0x00;  				// Heizung(P1.3) aus
+	P0_DATA = 0x00;  				// Motor (P0.3) aus
+	P1_DATA = 0x10;  				// Pumpe (P1.4) an
+	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
+		{
+			warten();
+		}
+	P1_DATA = 0x00;  				// Pumpe (P1.4) an	
+	IRCON0=0; 
 }
