@@ -44,7 +44,8 @@
 		unsigned int Y;         // (Steuersignal) Wasserzulauf
 		unsigned int H;         // (Steuersignal) Heizung
 		unsigned int M;         // (Steuersignal) Motor
-		unsigned int start;			// (Steuersignal) Start
+		unsigned int start = 0;	// (Steuersignal) Start
+		unsigned int ende = 0;	// (Steuersignal) Start			
 		unsigned int p; 				// (Variable) 10sek.
 		unsigned int i;					// (Variable) LCD-Anzeige
 
@@ -98,37 +99,35 @@ void zyklus1 (void)
 {
 	if (S3 == 1)
 	{
-	  {
 		P1_DATA =0x00;         // Wasserzulauf(P1.2) (Y) schließen
-		}
 		if (S2 == 0)
-				{
-					if (S6 == 1)
-					{
-					P1_DATA = 0x00;  // Heizung(P1.3) aus
-					P0_DATA = 0x08;  // Motor (P0.3) ein
-					}
-					else
-					{
-					P1_DATA = 0x08;	// Heizung(P1.3) ein
-				  P0_DATA = 0x08; // Motor (P0.3) eina
-					TR0 = 1;
-					}
-				}
+		{
+			if (S6 == 1)
+			{
+			P1_DATA = 0x00;  // Heizung(P1.3) aus
+			P0_DATA = 0x08;  // Motor (P0.3) ein
+			TR0 = 1;
+			}
 			else
-				{
-					if (S5 == 1)
-					{
-					P1_DATA = 0x00;  // Heizung(P1.3) aus
-					P0_DATA = 0x08;  // Motor (P0.3) ein	
-					}
-					else
-					{
-					P1_DATA = 0x08;	// Heizung(P1.3) ein
-				  P0_DATA = 0x08; // Motor (P0.3) ein
-					TR0 = 1;
-					}
-				}	
+			{
+			P1_DATA = 0x08;	// Heizung(P1.3) ein
+			P0_DATA = 0x08; // Motor (P0.3) ein
+			}
+		}
+		else
+		{
+			if (S5 == 1)
+			{
+			P1_DATA = 0x00;  // Heizung(P1.3) aus
+			P0_DATA = 0x08;  // Motor (P0.3) ein
+			TR0 = 1;
+			}
+			else
+			{
+			P1_DATA = 0x08;	// Heizung(P1.3) ein
+			P0_DATA = 0x08; // Motor (P0.3) ein
+			}
+		}		
 	}
 	else
 	  {
@@ -158,6 +157,7 @@ void init (void)
 //	EXICON0=0xFF;
 //	IT0=1;
 	EX0 = 1;					//Ext. 0 Freigabe
+	ET0 = 1;					//Timer 0 Freigabe
 	EA = 1; 					// Globale Freigabe
 }
 
@@ -199,13 +199,12 @@ void warten (void)
 void interrupt_switch_0 (void) interrupt 0
 {
 	P1_DATA = 0x00;  				// Heizung(P1.3) aus
-	P0_DATA = 0x00;  				// Motor (P0.3) aus
-	P1_DATA = 0x10;  				// Pumpe (P1.4) an
+	P0_DATA = 0x18;  				// MSchleudern (P0.4) und Motor (P0.3) an
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
 		{
 			warten();
 		}
-	P1_DATA = 0x00;  				// Pumpe (P1.4) an	
+	P1_DATA = 0x10;  				// Pumpe (P1.4) an	
 	IRCON0=0; 
 }
 
@@ -216,15 +215,24 @@ void interrupt_timer_0 (void) interrupt 1
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
 		{
 			warten();
+			zyklus1();
 		}
-	P1_DATA = 0x00;  				// Heizung(P1.3) aus
-	P0_DATA = 0x00;  				// Motor (P0.3) aus
-//	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
-//		{
-//			warten();
-//		}	
-	TF0 = 0;								//Timer Flag 0
-	ET0 = 1;								//Timer 0 interruptbetrieb-Freigabe
+	P0_DATA = 0x18;  				// MSchleudern (P0.4) und Motor (P0.3) an
+	P1_DATA = 0x10;  				// Pumpe (P1.4) an
+	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
+	{
+		warten();
+	}
+	P1_DATA = 0x00;  				// Pumpe (P1.4) aus
+	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
+	{
+		warten();
+	}
+	P0_DATA = 0x00;  				// MSchleudern (P0.4) und Motor (P0.3) aus
+	TF0 = 0;								// Timer Flag 0
+	ET0 = 1;								// Timer 0 interruptbetrieb-Freigabe
+	while(1);
+	
 }
 
 void zustand (void)
