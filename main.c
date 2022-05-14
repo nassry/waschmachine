@@ -45,11 +45,8 @@
 		unsigned int H;         // (Steuersignal) Heizung
 		unsigned int M;         // (Steuersignal) Motor
 		unsigned int start = 0;	// (Steuersignal) Start
-<<<<<<< Updated upstream
-		unsigned int ende = 0;	// (Steuersignal) Ende			
-=======
-		unsigned int ende = 0;	// (Steuersignal) Start			
->>>>>>> Stashed changes
+		unsigned int ende = 0;	// (Steuersignal) Ende					
+
 		unsigned int p; 				// (Variable) 10sek.
 		unsigned int i;					// (Variable) LCD-Anzeige
 
