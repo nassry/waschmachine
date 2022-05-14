@@ -1,9 +1,29 @@
-//(Deklaration)*****
+//************************************************
+//Deklaration
+//************************************************
 
 #include <xc866.h>
+
+//ADC-Funktionen:
+
+extern void adc_init(void);
+extern unsigned int adc_in(unsigned char kanal);
+
+//LCD-Funktionen:
+
+extern void lcd_init(void);			// Init LCD
+extern void lcd_clr(void);	 		// LCD Löschen 
+extern void lcd_curs(char);			// Cursor setzen
+extern void lcd_str(char *ptr); // LCD String
+extern void asc_out(char);			// ASC Funktion
+
+//Eigene Funktionen:
 void init (void);
 void zyklus1 (void);
 void zyklus2 (void) ;
+
+//Variablen:
+
 sbit S1 = P3_DATA^0;    // (Schalter)Hauptschalter
 sbit S2 = P3_DATA^1;    // (Sensor)Temperatur Schalter
 sbit S3 = P3_DATA^2;    // (Sensor)Fühlstand erreicht
@@ -22,6 +42,16 @@ void main (void)
 	init ();
 	while(1)
 	{
+				print();
+		start = 1;
+		while (temperatur_500 >= 300)
+		{
+			while (temperatur_500 >= 270)
+			{
+				print ();
+				start = 0;
+			}
+		}
 	  P0_DATA = 0x00;
 	  P1_DATA = 0x00;
 	  P3_DATA = 0x00;
