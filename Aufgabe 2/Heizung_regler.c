@@ -6,6 +6,8 @@
 
 //ADC-Funktionen:
 
+abc
+
 //Eigene Funktionen:
 
 void init (void);
