@@ -1,31 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@RaedAlhardan 
-nassry
-/
-waschmachine
-Public
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-waschmachine/Waschmaschine.c
-@RaedAlhardan
-RaedAlhardan Add files via upload
-Latest commit 1c4a6f1 now
- History
- 1 contributor
-79 lines (69 sloc)  1.43 KB
-   
 //(Deklaration)*****
 
 #include <xc866.h>
@@ -103,17 +75,3 @@ void init (void)
 	P1_DIR = 0xFF;
 	P3_DIR = 0x00;
 }
-
-  
-© 2022 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
