@@ -12,7 +12,7 @@
 // LCD Funktionen:
 		extern void lcd_init(void);		      // Init LCD
 		extern void lcd_clr(void);	 	     	// LCD Löschen 
-		extern void lcd_byte(char);  	     	// Ausgabe unsigned char  => 3 stellig
+
 		extern void lcd_str(char *ptr);	    // Ausgabe String
 		extern void lcd_curs(char);		      // Cursor setzen
 		extern void asc_out(char);	   		  // Ausgabe eines ASCII Zeichens
@@ -29,7 +29,6 @@
 		void init (void);
 		void zyklus1 (void);
 		void teiler (void);							// Teilen in einzelne Ziffer
-		void print (void);							// Temperatur darstellen
 		void warten (void);							// 5.461 msec. 
 		void zustand (void);						// LCD-Anzeige
 
@@ -45,7 +44,7 @@
 		unsigned int H;         // (Steuersignal) Heizung
 		unsigned int M;         // (Steuersignal) Motor
 		unsigned int start = 0;	// (Steuersignal) Start
-		unsigned int ende = 0;	// (Steuersignal) Start			
+		unsigned int ende = 0;	// (Steuersignal) Ende			
 		unsigned int p; 				// (Variable) 10sek.
 		unsigned int i;					// (Variable) LCD-Anzeige
 
@@ -65,20 +64,18 @@ void main (void)
 	while(1)
 	{
 		zustand();
-
 		start = 1;
 		i = 0;
 		while (temperatur_500 >= 300)
 		{
 			while (temperatur_500 >= 270)
 			{
-
 				start = 0;
 			}
 		}
 		if (S1==1)
 		{	
-			i = 1;
+			i = 2;
 			if (start == 1)
 			{
 			zyklus1();
@@ -86,7 +83,6 @@ void main (void)
 		}
 		else
 		{
-//			print();
 		}	
 	}
 }
@@ -132,6 +128,8 @@ void zyklus1 (void)
 	else
 	  {
 	  P1_DATA = 0x04;				      //Wasserzulauf(P1.2) (Y) öffnen
+//		i = 1;
+//		zustand();
 		}
 } 
 
@@ -188,30 +186,33 @@ void print (void)
 
 void warten (void)
 {
-	TF0 = 0;								//Timer-Flag auf 0 - bitaddresiert
-	TL0 = 0x00;							//Erste 8-binare - bitadresiert (start)
-	TH0 = 0x00;							//Zweite 8-binare - bitadresiert
-	TR0 = 1;								//Timer 0 starten - bitadresiert 
+	TF0 = 0;								// Timer-Flag auf 0 - bitaddresiert
+	TL0 = 0x00;							// Erste 8-binare - bitadresiert (start)
+	TH0 = 0x00;							// Zweite 8-binare - bitadresiert
+	TR0 = 1;								// Timer 0 starten - bitadresiert 
 	while (TF0 == 0);
 	TR0 = 0;								//Timer 0 stoppt - bitadressiert
 }
 
 void interrupt_switch_0 (void) interrupt 0
 {
-	P1_DATA = 0x00;  				// Heizung(P1.3) aus
-	P0_DATA = 0x18;  				// MSchleudern (P0.4) und Motor (P0.3) an
+	P1_DATA = 0x00;  				// Heizung (P1.3)aus
+	P0_DATA = 0x00;  				// Motor (P0.3) aus
+	P1_DATA = 0x10;  				// Pumpe (P1.4) an
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
 		{
 			warten();
 		}
-	P1_DATA = 0x10;  				// Pumpe (P1.4) an	
-	IRCON0=0; 
+	P1_DATA = 0x00;  				// Pumpe (P1.4) aus	
+	IRCON0=0;
+	EA = 0;
+  while(S1==0);		
 }
 
 void interrupt_timer_0 (void) interrupt 1
 {
-	ET0 = 0;								//Timer 0 Freigabe löschen
-	TR0 = 0;
+	ET0 = 0;								// Timer 0 Freigabe löschen
+	TR0 = 0;								// Timer 0 stoppt
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
 		{
 			warten();
@@ -231,8 +232,8 @@ void interrupt_timer_0 (void) interrupt 1
 	P0_DATA = 0x00;  				// MSchleudern (P0.4) und Motor (P0.3) aus
 	TF0 = 0;								// Timer Flag 0
 	ET0 = 1;								// Timer 0 interruptbetrieb-Freigabe
-	while(1);
-	
+	EA = 0;
+	while(S1==1);						// Programm Neustart
 }
 
 void zustand (void)
@@ -243,9 +244,14 @@ void zustand (void)
 			lcd_curs(1);				// Cursor auf Position 1 setzen
 	    lcd_str(Waus);
 		  break;
+//	case 1:
+//		lcd_curs(20);				// Cursor auf Position 1 setzen
+//		lcd_str(WS3);
+//		break;
 		default:
 			lcd_curs(1);				// Cursor auf Position 1 setzen
 	    lcd_str(Wan);
 			break;
 	}
 }
+
