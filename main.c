@@ -111,8 +111,8 @@ void zyklus1 (void)
 					else
 					{
 					P1_DATA = 0x08;	// Heizung(P1.3) ein
-				  P0_DATA = 0x08; // Motor (P0.3) ein
-						TR0 = 1;
+				  P0_DATA = 0x08; // Motor (P0.3) eina
+					TR0 = 1;
 					}
 				}
 			else
@@ -126,7 +126,7 @@ void zyklus1 (void)
 					{
 					P1_DATA = 0x08;	// Heizung(P1.3) ein
 				  P0_DATA = 0x08; // Motor (P0.3) ein
-						TR0 = 1;
+					TR0 = 1;
 					}
 				}	
 	}
@@ -211,14 +211,20 @@ void interrupt_switch_0 (void) interrupt 0
 
 void interrupt_timer_0 (void) interrupt 1
 {
+	ET0 = 0;								//Timer 0 Freigabe löschen
+	TR0 = 0;
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
 		{
 			warten();
 		}
 	P1_DATA = 0x00;  				// Heizung(P1.3) aus
 	P0_DATA = 0x00;  				// Motor (P0.3) aus
-		
-	TF0 = 0;
+//	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
+//		{
+//			warten();
+//		}	
+	TF0 = 0;								//Timer Flag 0
+	ET0 = 1;								//Timer 0 interruptbetrieb-Freigabe
 }
 
 void zustand (void)
