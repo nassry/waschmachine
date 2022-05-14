@@ -54,7 +54,7 @@ void init (void)
 	
 	//Interrupt
 	ET0 = 1;								//Timer 0 Freigabe
-	EA = 1; 								// Globale Freigabe
+	EA = 1; 								//Globale Freigabe
 }
 
 void motor_einschalten (void)
