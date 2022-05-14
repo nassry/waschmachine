@@ -78,22 +78,7 @@ void main (void)
 			i = 2;
 			if (start == 1)
 			{
-			zyklus1();
-			}
-		}
-		else
-		{
-		}	
-	}
-}
-
-//************************************************
-// Funktionen
-//************************************************
-
-void zyklus1 (void)
-{
-	if (S3 == 1)
+			if (S3 == 1)
 	{
 		P1_DATA =0x00;         // Wasserzulauf(P1.2) (Y) schließen
 		if (S2 == 0)
@@ -130,8 +115,17 @@ void zyklus1 (void)
 	  P1_DATA = 0x04;				      //Wasserzulauf(P1.2) (Y) öffnen
 //		i = 1;
 //		zustand();
+			}
 		}
-} 
+		else
+		{
+		}	
+	}
+}
+
+//************************************************
+// Funktionen
+//************************************************
 
 void init (void)
 {
