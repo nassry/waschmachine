@@ -9,13 +9,21 @@
 extern void adc_init(void);
 extern unsigned int adc_in(unsigned char kanal);
 
-//LCD-Funktionen:
-
-extern void lcd_init(void);			// Init LCD
-extern void lcd_clr(void);	 		// LCD Löschen 
-extern void lcd_curs(char);			// Cursor setzen
-extern void lcd_str(char *ptr); // LCD String
-extern void asc_out(char);			// ASC Funktion
+// LCD Funktionen
+   extern void lcd_init(void);		      // Init LCD
+   extern void lcd_clr(void);	 	     	  // LCD Löschen 
+   extern void lcd_byte(char);  	     	// Ausgabe unsigned char  => 3 stellig
+   extern void lcd_str(char *ptr);	    // Ausgabe String
+   extern void lcd_curs(char);		      // Cursor setzen
+   extern void asc_out(char);	   		    // Ausgabe eines ASCII Zeichens
+   extern void lcd_int(unsigned int);	  // Ausgabe Int Wert => 4 stellig
+	 
+// Texte
+	unsigned char Waus[]="Waschmaschine Aus";   	// LCD-Text Waschmaschine Aus
+	 unsigned char Wan[]="Waschmaschine An";   	  // LCD-Text Waschmaschine An
+	 unsigned char WS3[]="Wasserzulauf bis S3";   // LCD-Text Wasserzulauf bis S3
+	 unsigned char Han[]="Heizung An";   	        // LCD-Text Heizung An
+	 unsigned char Man[]="Motor An";   	          // LCD-Text Motor An
 
 //Eigene Funktionen:
 
@@ -84,22 +92,26 @@ void zyklus1 (void)
 				{
 					if (S6 == 1)
 					{
-					P0_DATA =0x80;				// Heizung(P0.4) aus ; Motor(P0.7) ein; 
+					P1_DATA =0x00;  // Heizung(P1.3) aus
+					P0_DATA = 0x08; // Motor (P0.3) ein
 					}
 					else
 					{
-					P0_DATA =0x90;				// Heizung(P0.4) ein ; Motor(P0.7) ein;
+					P1_DATA =0x08;	// Heizung(P1.3) ein
+				        P0_DATA = 0x08; // Motor (P0.3) ein
 					}
 				}
 			else
 				{
 					if (S5 == 1)
 					{
-					P0_DATA =0x80;				// Heizung aus ; Motor ein;	
+					P1_DATA =0x00;  // Heizung(P1.3) aus
+					P0_DATA = 0x08; // Motor (P0.3) ein	
 					}
 					else
 					{
-					P0_DATA =0x90;				// Heizung ein ; Motor ein;
+					P1_DATA =0x08;	// Heizung(P1.3) ein
+				        P0_DATA = 0x08; // Motor (P0.3) ein
 					}
 				}	
 	}
