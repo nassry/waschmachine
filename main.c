@@ -1,15 +1,15 @@
 //************************************************
-//Deklaration
+// Deklaration
 //************************************************
 
 #include <xc866.h>
 
-//ADC-Funktionen:
+// ADC-Funktionen:
 
 		extern void adc_init(void);
 		extern unsigned int adc_in(unsigned char kanal);
 
-// LCD Funktionen
+// LCD Funktionen:
 		extern void lcd_init(void);		      // Init LCD
 		extern void lcd_clr(void);	 	     	// LCD Löschen 
 		extern void lcd_byte(char);  	     	// Ausgabe unsigned char  => 3 stellig
@@ -18,25 +18,22 @@
 		extern void asc_out(char);	   		  // Ausgabe eines ASCII Zeichens
 		extern void lcd_int(unsigned int);	// Ausgabe Int Wert => 4 stellig
 	 
-// Texte
+// Texte:
 		unsigned char Waus[]="Waschmaschine Aus";   	// LCD-Text Waschmaschine Aus
 		unsigned char Wan[]="Waschmaschine An ";   	  // LCD-Text Waschmaschine An
 		unsigned char WS3[]="Wasserzulauf bis S3";    // LCD-Text Wasserzulauf bis S3
 		unsigned char Han[]="Heizung An";   	        // LCD-Text Heizung An
 		unsigned char Man[]="Motor An";   	          // LCD-Text Motor An
 
-//Eigene Funktionen:
-
+// Eigene Funktionen:
 		void init (void);
 		void zyklus1 (void);
-		void zyklus2 (void);
 		void teiler (void);							// Teilen in einzelne Ziffer
 		void print (void);							// Temperatur darstellen
 		void warten (void);							// 5.461 msec. 
 		void zustand (void);						// LCD-Anzeige
 
-//Variablen:
-
+// Variablen:
 		sbit S1 = P0_DATA^5;    // (Schalter)Hauptschalter - Interruptbetrieb EXT0
 		sbit S2 = P3_DATA^1;    // (Sensor)Temperatur Schalter
 		sbit S3 = P3_DATA^2;    // (Sensor)Fühlstand erreicht
@@ -51,13 +48,15 @@
 		unsigned int p; 				// (Variable) 10sek.
 		unsigned int i;					// (Variable) LCD-Anzeige
 
-
 		unsigned int temperatur_8;				// Temperatur 8_bit
 		unsigned int temperatur_10;			  // Temperatur 10_bit
 		unsigned int temperatur_500;			// Temperatur 0-50,0°C
 		unsigned int H, Z, E, temperatur;	// Speicher für H,Z,E
 
-//(Main)*****
+//************************************************
+// Main
+//************************************************
+
 
 void main (void)
 {
@@ -91,26 +90,29 @@ void main (void)
 	}
 }
 
-//(Funktionen)*****
+//************************************************
+// Funktionen
+//************************************************
 
 void zyklus1 (void)
 {
 	if (S3 == 1)
 	{
 	  {
-		P1_DATA =0x00;              //Wasserzulauf(P1.2) (Y) schließen
+		P1_DATA =0x00;         // Wasserzulauf(P1.2) (Y) schließen
 		}
 		if (S2 == 0)
 				{
 					if (S6 == 1)
 					{
 					P1_DATA = 0x00;  // Heizung(P1.3) aus
-					P0_DATA = 0x08; // Motor (P0.3) ein
+					P0_DATA = 0x08;  // Motor (P0.3) ein
 					}
 					else
 					{
 					P1_DATA = 0x08;	// Heizung(P1.3) ein
 				  P0_DATA = 0x08; // Motor (P0.3) ein
+						TR0 = 1;
 					}
 				}
 			else
@@ -118,12 +120,13 @@ void zyklus1 (void)
 					if (S5 == 1)
 					{
 					P1_DATA = 0x00;  // Heizung(P1.3) aus
-					P0_DATA = 0x08; // Motor (P0.3) ein	
+					P0_DATA = 0x08;  // Motor (P0.3) ein	
 					}
 					else
 					{
 					P1_DATA = 0x08;	// Heizung(P1.3) ein
 				  P0_DATA = 0x08; // Motor (P0.3) ein
+						TR0 = 1;
 					}
 				}	
 	}
@@ -204,6 +207,18 @@ void interrupt_switch_0 (void) interrupt 0
 		}
 	P1_DATA = 0x00;  				// Pumpe (P1.4) an	
 	IRCON0=0; 
+}
+
+void interrupt_timer_0 (void) interrupt 1
+{
+	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
+		{
+			warten();
+		}
+	P1_DATA = 0x00;  				// Heizung(P1.3) aus
+	P0_DATA = 0x00;  				// Motor (P0.3) aus
+		
+	TF0 = 0;
 }
 
 void zustand (void)
