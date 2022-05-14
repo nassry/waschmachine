@@ -19,11 +19,11 @@ extern unsigned int adc_in(unsigned char kanal);
    extern void lcd_int(unsigned int);	  // Ausgabe Int Wert => 4 stellig
 	 
 // Texte
-	unsigned char Waus[]="Waschmaschine Aus";   	// LCD-Text Waschmaschine Aus
-	 unsigned char Wan[]="Waschmaschine An";   	  // LCD-Text Waschmaschine An
-	 unsigned char WS3[]="Wasserzulauf bis S3";   // LCD-Text Wasserzulauf bis S3
-	 unsigned char Han[]="Heizung An";   	        // LCD-Text Heizung An
-	 unsigned char Man[]="Motor An";   	          // LCD-Text Motor An
+unsigned char Waus[]="Waschmaschine Aus";   	// LCD-Text Waschmaschine Aus
+unsigned char Wan[]="Waschmaschine An";   	  // LCD-Text Waschmaschine An
+unsigned char WS3[]="Wasserzulauf bis S3";   // LCD-Text Wasserzulauf bis S3
+unsigned char Han[]="Heizung An";   	        // LCD-Text Heizung An
+unsigned char Man[]="Motor An";   	          // LCD-Text Motor An
 
 //Eigene Funktionen:
 
@@ -59,27 +59,29 @@ void main (void)
 	init ();
 	while(1)
 	{
+		print();
+		start = 1;
+		while (temperatur_500 >= 300)
+		{
+			while (temperatur_500 >= 270)
+			{
+				print();
+				start = 0;
+			}
+		}
 		if (S1==1)
 		{	
-			print();
-			start = 1;
-			while (temperatur_500 >= 300)
-			{
-				while (temperatur_500 >= 270)
-				{
-					print();
-					start = 0;
-				}
-			}
 			if (start == 1)
 			{
 			print ();
 			zyklus1();
 			}
 		}
-
+		else
+		{
+			print();
+		}	
 	}
-	
 }
 
 //(Funktionen)*****
@@ -95,26 +97,26 @@ void zyklus1 (void)
 				{
 					if (S6 == 1)
 					{
-					P1_DATA =0x00;  // Heizung(P1.3) aus
+					P1_DATA = 0x00;  // Heizung(P1.3) aus
 					P0_DATA = 0x08; // Motor (P0.3) ein
 					}
 					else
 					{
-					P1_DATA =0x08;	// Heizung(P1.3) ein
-				        P0_DATA = 0x08; // Motor (P0.3) ein
+					P1_DATA = 0x08;	// Heizung(P1.3) ein
+				  P0_DATA = 0x08; // Motor (P0.3) ein
 					}
 				}
 			else
 				{
 					if (S5 == 1)
 					{
-					P1_DATA =0x00;  // Heizung(P1.3) aus
+					P1_DATA = 0x00;  // Heizung(P1.3) aus
 					P0_DATA = 0x08; // Motor (P0.3) ein	
 					}
 					else
 					{
-					P1_DATA =0x08;	// Heizung(P1.3) ein
-				        P0_DATA = 0x08; // Motor (P0.3) ein
+					P1_DATA = 0x08;	// Heizung(P1.3) ein
+				  P0_DATA = 0x08; // Motor (P0.3) ein
 					}
 				}	
 	}
