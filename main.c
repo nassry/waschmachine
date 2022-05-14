@@ -1,99 +1,119 @@
-//************************************************
-//Declaration qweqwe
-//************************************************
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@RaedAlhardan 
+nassry
+/
+waschmachine
+Public
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+waschmachine/Waschmaschine.c
+@RaedAlhardan
+RaedAlhardan Add files via upload
+Latest commit 1c4a6f1 now
+ History
+ 1 contributor
+79 lines (69 sloc)  1.43 KB
+   
+//(Deklaration)*****
 
 #include <xc866.h>
-
-//ADC-Funktionen:
-
-
-
-//Eigene Funktionen:
-
 void init (void);
-void eine_minute (void);
-void motor_einschalten (void);
-void motor_ausschalten (void);
-void heizung_einschalten (void);
-void heizung_ausschalten (void);
+void zyklus1 (void);
+void zyklus2 (void) ;
+sbit S1 = P3_DATA^0;    // (Schalter)Hauptschalter
+sbit S2 = P3_DATA^1;    // (Sensor)Temperatur Schalter
+sbit S3 = P3_DATA^2;    // (Sensor)Fühlstand erreicht
+sbit S4 = P3_DATA^3;    // (Sensor)Füllstand überschritten
+sbit S5 = P3_DATA^4;    // (Signal) benutzer Anwahl 60 grad
+sbit S6 = P3_DATA^5;    // (Signal) benutzer Anwahl 90 grad
 
-//Variablen:
+unsigned int Y;         // (Steuersignal) Wasserzulauf
+unsigned int H;         // (Steuersignal) Heizung
+unsigned int M;         // (Steuersignal) Motor
 
-unsigned int motor;				//Motor als Variablen
-unsigned int i;						//i loop
-sbit S3 = P3_DATA^3;			//S3 Wasserpegel vom P3.3
-
-
-//************************************************
-//Main
-//************************************************
+//(Main)*****
 
 void main (void)
 {
 	init ();
 	while(1)
 	{
-		motor_einschalten();
-		heizung_einschalten();		
+	  P0_DATA = 0x00;
+	  P1_DATA = 0x00;
+	  P3_DATA = 0x00;
+		zyklus1();
+		zyklus2();
 	}
+	
 }
 
-//************************************************
-//Function
-//************************************************
+//(Funktionen)*****
+
+void zyklus1 (void)
+{
+	if (S3 == 1)
+	{
+	  {
+		P1_DATA =0x00;              //Wasserzulauf (Y) schließen
+		}
+		if (S2 == 0)
+				{
+					if (S6 == 1)
+					{
+					P0_DATA =0x80;				// Heizung aus ; Motor ein;
+					}
+					else
+					{
+					P0_DATA =0xa0;				// Heizung ein ; Motor ein;
+					}
+				}
+			else
+				{
+					if (S5 == 1)
+					{
+					P0_DATA =0x80;				// Heizung aus ; Motor ein;	
+					}
+					else
+					{
+					P0_DATA =0xa0;				// Heizung ein ; Motor ein;
+					}
+				}	
+	}
+	else
+	  {
+	  P1_DATA = 0x04;				      //Wasserzulauf (Y) öffnen
+		}
+} 
 
 void init (void)
 {
-	P3_DIR = 0x00;					//P3.1 bis P3.7 als Eingänge
-	P1_DIR = 0xFF;					//P1.2 bis P1.4 als Ausgänge
-	P0_DIR = 0x1F;					//P0.3 und P0.4 als Ausgänge, P0.5 als Eingang
-	TMOD = 0x11;						//Timer 0 initialisiert
-	
-	
-	//Interrupt
-	EX0 = 1;								//Ext. 0 Freigabe
-	EA = 1; 								// Globale Freigabe
+	P0_DIR = 0xFF;
+	P1_DIR = 0xFF;
+	P3_DIR = 0x00;
 }
 
-void motor_einschalten (void)
-{
-	P0_DATA = 0x08;
-}
-
-void motor_ausschalten (void)
-{
-	P0_DATA = 0x00;
-}
-void heizung_einschalten (void)
-{
-	P1_DATA = 0x08;
-}
-
-void heizung_ausschalten (void)
-{
-	P1_DATA = 0x00;
-}
-
-void eine_minute (void)
-{
-	//*****
-	// Timertakt 12MHz
-	// 60 Sek / 5.461 mSek = 10.986,99 Flags (10.987)
-	// bzw. 1 sec = 186
-	//*****
-	for (i = 1; i < 186; i++)
-		{
-			TF0 = 0;								//Timer-Flag auf 0 - bitaddresiert
-			TL0 = 0x00;							//Erste 8-binare - bitadresiert (start)
-			TH0 = 0x00;							//Zweite 8-binare - bitadresiert
-			TR0 = 1;								//Timer 0 starten - bitadresiert 
-			while (TF0 == 0);
-			TR0 = 0;								//Timer 0 stoppt - bitadressiert
-		}
-}
-
-void interrupt_switch_0 (void) interrupt 0
-{
-	motor_ausschalten();
-	heizung_ausschalten();
-}
+  
+© 2022 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
