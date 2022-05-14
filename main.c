@@ -6,8 +6,7 @@
 
 //ADC-Funktionen:
 
-extern void adc_init(void);
-extern unsigned int adc_in(unsigned char kanal);
+
 
 //Eigene Funktionen:
 
