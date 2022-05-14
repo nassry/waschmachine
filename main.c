@@ -31,6 +31,8 @@
 		void teiler (void);							// Teilen in einzelne Ziffer
 		void warten (void);							// 5.461 msec. 
 		void zustand (void);						// LCD-Anzeige
+		void wasserzulauf_an (void);		//
+		void wasserzulauf_aus (void);		//
 
 // Variablen:
 		sbit S1 = P0_DATA^5;    // (Schalter)Hauptschalter - Interruptbetrieb EXT0
@@ -78,44 +80,42 @@ void main (void)
 			i = 2;
 			if (start == 1)
 			{
-			if (S3 == 1)
-	{
-		P1_DATA =0x00;         // Wasserzulauf(P1.2) (Y) schließen
-		if (S2 == 0)
-		{
-			if (S6 == 1)
-			{
-			P1_DATA = 0x00;  // Heizung(P1.3) aus
-			P0_DATA = 0x08;  // Motor (P0.3) ein
-			TR0 = 1;
-			}
-			else
-			{
-			P1_DATA = 0x08;	// Heizung(P1.3) ein
-			P0_DATA = 0x08; // Motor (P0.3) ein
-			}
-		}
-		else
-		{
-			if (S5 == 1)
-			{
-			P1_DATA = 0x00;  // Heizung(P1.3) aus
-			P0_DATA = 0x08;  // Motor (P0.3) ein
-			TR0 = 1;
-			}
-			else
-			{
-			P1_DATA = 0x08;	// Heizung(P1.3) ein
-			P0_DATA = 0x08; // Motor (P0.3) ein
-			}
-		}		
-	}
-	else
-	  {
-	  P1_DATA = 0x04;				      //Wasserzulauf(P1.2) (Y) öffnen
-//		i = 1;
-//		zustand();
-		}
+				if (S3 == 1)
+				{
+					P1_DATA =0x00;         // Wasserzulauf(P1.2) (Y) schließen
+					if (S2 == 0)
+					{
+						if (S6 == 1)
+						{
+							P1_DATA = 0x00;  // Heizung(P1.3) aus
+							P0_DATA = 0x08;  // Motor (P0.3) ein
+							TR0 = 1;
+						}
+						else
+						{
+							P1_DATA = 0x08;	// Heizung(P1.3) ein
+							P0_DATA = 0x08; // Motor (P0.3) ein
+						}
+					}
+					else
+					{
+						if (S5 == 1)
+						{
+							P1_DATA = 0x00;  // Heizung(P1.3) aus
+							P0_DATA = 0x08;  // Motor (P0.3) ein
+							TR0 = 1;
+						}
+						else
+						{
+							P1_DATA = 0x08;	// Heizung(P1.3) ein
+							P0_DATA = 0x08; // Motor (P0.3) ein
+						}
+					}		
+				}
+				else
+				{
+					wasserzulauf_an();				      //Wasserzulauf(P1.2) (Y) öffnen
+				}
 			}
 		}
 		else
@@ -128,6 +128,18 @@ void main (void)
 // Funktionen
 //************************************************
 
+void wasserzulauf_an (void)
+{
+	P1_DATA = 0x04;
+	i = 1;
+	zustand();
+}
+
+void wasserzulauf_aus (void)
+{
+
+}
+	
 void init (void)
 {
 	lcd_init();			// Initiierung des Bildschirms

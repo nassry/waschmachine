@@ -7,7 +7,6 @@ void zustand (void);
 
 unsigned char Waus[]="Waschmaschine Aus";   	// LCD-Text Waschmaschine Aus
 unsigned char Wan[]="Waschmaschine An";   	  // LCD-Text Waschmaschine An
-
 unsigned int i;
 
 // LCD Funktionen
