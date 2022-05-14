@@ -20,7 +20,7 @@
 	 
 // Texte
 		unsigned char Waus[]="Waschmaschine Aus";   	// LCD-Text Waschmaschine Aus
-		unsigned char Wan[]="Waschmaschine An";   	  // LCD-Text Waschmaschine An
+		unsigned char Wan[]="Waschmaschine An ";   	  // LCD-Text Waschmaschine An
 		unsigned char WS3[]="Wasserzulauf bis S3";    // LCD-Text Wasserzulauf bis S3
 		unsigned char Han[]="Heizung An";   	        // LCD-Text Heizung An
 		unsigned char Man[]="Motor An";   	          // LCD-Text Motor An
@@ -33,6 +33,7 @@
 		void teiler (void);							// Teilen in einzelne Ziffer
 		void print (void);							// Temperatur darstellen
 		void warten (void);							// 5.461 msec. 
+		void zustand (void);						// LCD-Anzeige
 
 //Variablen:
 
@@ -47,7 +48,8 @@
 		unsigned int H;         // (Steuersignal) Heizung
 		unsigned int M;         // (Steuersignal) Motor
 		unsigned int start;			// (Steuersignal) Start
-		unsigned int p; 
+		unsigned int p; 				// (Variable) 10sek.
+		unsigned int i;					// (Variable) LCD-Anzeige
 
 
 		unsigned int temperatur_8;				// Temperatur 8_bit
@@ -62,27 +64,29 @@ void main (void)
 	init ();
 	while(1)
 	{
-		print();
+		zustand();
+
 		start = 1;
+		i = 0;
 		while (temperatur_500 >= 300)
 		{
 			while (temperatur_500 >= 270)
 			{
-				print();
+
 				start = 0;
 			}
 		}
 		if (S1==1)
 		{	
+			i = 1;
 			if (start == 1)
 			{
-			print ();
 			zyklus1();
 			}
 		}
 		else
 		{
-			print();
+//			print();
 		}	
 	}
 }
@@ -145,6 +149,7 @@ void init (void)
 	TMOD = 0x11;      // Timer 0 initialisiert
 	
 	adc_init();				// ADC initialisieren
+	IRCON0=0;
 	
 	//Interrupt
 //	EXICON0=0xFF;
@@ -199,4 +204,19 @@ void interrupt_switch_0 (void) interrupt 0
 		}
 	P1_DATA = 0x00;  				// Pumpe (P1.4) an	
 	IRCON0=0; 
+}
+
+void zustand (void)
+{
+	switch(i)
+	{
+		case 0:
+			lcd_curs(1);				// Cursor auf Position 1 setzen
+	    lcd_str(Waus);
+		  break;
+		default:
+			lcd_curs(1);				// Cursor auf Position 1 setzen
+	    lcd_str(Wan);
+			break;
+	}
 }
