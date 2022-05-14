@@ -59,20 +59,23 @@ void main (void)
 	init ();
 	while(1)
 	{
-		print();
-		start = 1;
-		while (temperatur_500 >= 300)
-		{
-			while (temperatur_500 >= 270)
+		if (S1==1)
+		{	
+			print();
+			start = 1;
+			while (temperatur_500 >= 300)
 			{
-				print();
-				start = 0;
+				while (temperatur_500 >= 270)
+				{
+					print();
+					start = 0;
+				}
 			}
-		}
-		if (start == 1)
-		{
+			if (start == 1)
+			{
 			print ();
 			zyklus1();
+			}
 		}
 
 	}
@@ -123,16 +126,19 @@ void zyklus1 (void)
 
 void init (void)
 {
-	P0_DIR = 0xFF;
+	lcd_init();														// Initiierung des Bildschirms
+	lcd_clr();														// Löschen des Bildschirms
+	
+	P0_DIR = 0x18;	// P0.5 als Eingang, P0.4 und P0.3 als Ausgang
 	P1_DIR = 0xFF;
-	P3_DIR = 0x00;
+	P3_DIR = 0x00;	
 	
 	P0_DATA = 0x00;
 	P1_DATA = 0x00;
 	P3_DATA = 0x00;
 	
-	lcd_init();										// LCD initialisieren
-	lcd_clr();										// Anzeige löschen
+	TMOD = 0x11;      // Timer 0 initialisiert
+	
 	adc_init();										// ADC initialisieren
 }
 
