@@ -31,7 +31,6 @@
 		void teiler (void);							// Teilen in einzelne Ziffer
 		void warten (void);							// 5.461 msec. 
 		void zustand (void);						// LCD-Anzeige
-		void wasserzulauf_an (void);
 
 // Variablen:
 		sbit S1 = P0_DATA^5;    // (Schalter)Hauptschalter - Interruptbetrieb EXT0
@@ -45,8 +44,7 @@
 		unsigned int H;         // (Steuersignal) Heizung
 		unsigned int M;         // (Steuersignal) Motor
 		unsigned int start = 0;	// (Steuersignal) Start
-		unsigned int ende = 0;	// (Steuersignal) Ende					
-
+		unsigned int ende = 0;	// (Steuersignal) Ende			
 		unsigned int p; 				// (Variable) 10sek.
 		unsigned int i;					// (Variable) LCD-Anzeige
 
@@ -54,8 +52,6 @@
 		unsigned int temperatur_10;			  // Temperatur 10_bit
 		unsigned int temperatur_500;			// Temperatur 0-50,0°C
 		unsigned int H, Z, E, temperatur;	// Speicher für H,Z,E
-		
-		
 
 //************************************************
 // Main
@@ -82,7 +78,22 @@ void main (void)
 			i = 2;
 			if (start == 1)
 			{
-			if (S3 == 1)
+			zyklus1();
+			}
+		}
+		else
+		{
+		}	
+	}
+}
+
+//************************************************
+// Funktionen
+//************************************************
+
+void zyklus1 (void)
+{
+	if (S3 == 1)
 	{
 		P1_DATA =0x00;         // Wasserzulauf(P1.2) (Y) schließen
 		if (S2 == 0)
@@ -116,33 +127,11 @@ void main (void)
 	}
 	else
 	  {
-<<<<<<< Updated upstream
 	  P1_DATA = 0x04;				      //Wasserzulauf(P1.2) (Y) öffnen
 //		i = 1;
 //		zustand();
-=======
-			wasserzulauf_an();
 		}
->>>>>>> Stashed changes
-			}
-		}
-		else
-		{
-		}	
-	}
-}
-
-//************************************************
-// Funktionen
-//************************************************
-<<<<<<< Updated upstream
-=======
-void wasserzulauf_an (void)
-{
-	P1_DATA = 0x04;				      //Wasserzulauf(P1.2) (Y) öffnen
-	zustand();
-}
->>>>>>> Stashed changes
+} 
 
 void init (void)
 {
@@ -207,38 +196,23 @@ void warten (void)
 
 void interrupt_switch_0 (void) interrupt 0
 {
-<<<<<<< Updated upstream
 	P1_DATA = 0x00;  				// Heizung (P1.3)aus
 	P0_DATA = 0x00;  				// Motor (P0.3) aus
 	P1_DATA = 0x10;  				// Pumpe (P1.4) an
-=======
-	P1_DATA = 0x00;  				// Heizung(P1.3) aus
-	P0_DATA = 0x18;  				// MSchleudern (P0.4) und Motor (P0.3) an
->>>>>>> Stashed changes
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
 		{
 			warten();
 		}
-<<<<<<< Updated upstream
 	P1_DATA = 0x00;  				// Pumpe (P1.4) aus	
 	IRCON0=0;
 	EA = 0;
   while(S1==0);		
-=======
-	P1_DATA = 0x10;  				// Pumpe (P1.4) an	
-	IRCON0=0; 
->>>>>>> Stashed changes
 }
 
 void interrupt_timer_0 (void) interrupt 1
 {
-<<<<<<< Updated upstream
 	ET0 = 0;								// Timer 0 Freigabe löschen
 	TR0 = 0;								// Timer 0 stoppt
-=======
-	ET0 = 0;								//Timer 0 Freigabe löschen
-	TR0 = 0;
->>>>>>> Stashed changes
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
 		{
 			warten();
@@ -258,13 +232,8 @@ void interrupt_timer_0 (void) interrupt 1
 	P0_DATA = 0x00;  				// MSchleudern (P0.4) und Motor (P0.3) aus
 	TF0 = 0;								// Timer Flag 0
 	ET0 = 1;								// Timer 0 interruptbetrieb-Freigabe
-<<<<<<< Updated upstream
 	EA = 0;
 	while(S1==1);						// Programm Neustart
-=======
-	while(1);
-	
->>>>>>> Stashed changes
 }
 
 void zustand (void)
@@ -275,21 +244,13 @@ void zustand (void)
 			lcd_curs(1);				// Cursor auf Position 1 setzen
 	    lcd_str(Waus);
 		  break;
-<<<<<<< Updated upstream
 //	case 1:
 //		lcd_curs(20);				// Cursor auf Position 1 setzen
 //		lcd_str(WS3);
 //		break;
-=======
-		case 1:
-			lcd_curs(20);				// Cursor auf Position 1 setzen
-	    lcd_str(WS3);
-		  break;
->>>>>>> Stashed changes
 		default:
 			lcd_curs(1);				// Cursor auf Position 1 setzen
 	    lcd_str(Wan);
 			break;
 	}
 }
-
