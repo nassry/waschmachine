@@ -66,6 +66,7 @@ void main (void)
 		zustand();
 		start = 1;
 		anzeige = 1;
+		P0_DATA = 0x00;
 		while (temperatur_500 >= 300)
 		{
 			while (temperatur_500 >= 270)
@@ -73,6 +74,7 @@ void main (void)
 				start = 0;
 			}
 		}
+		
 		if (S1==1)
 		{	
 			anzeige = 0;
@@ -100,6 +102,7 @@ void waschgang (void)			// Funktion Waschgang
 		{
 			if (S6 == 1)				// Wenn Signal 1 an S6; Temperatur 60°C erreicht
 			{
+			EA = 1;
 			P1_DATA = 0x00;  		// Heizung(P1.3) aus; Heizung H ausschalten wenn 60°C erreicht sind
 			anzeige = 4;				// LCD-Text Heizung aus
 			P0_DATA = 0x08;  		// Motor (P0.3) ein;  Motor M einschalten sobald Signal 1 an S3; Füllstand erreicht
@@ -118,6 +121,7 @@ void waschgang (void)			// Funktion Waschgang
 		{
 			if (S5 == 1)				// Signal 1 an S5; Temperatur 90°C erreicht					
 			{
+			EA = 1;
 			P1_DATA = 0x00;  		// Heizung(P1.3) aus; Heizung H ausschalten wenn 90°C erreicht sind
 			anzeige = 4;				// LCD-Text Heizung aus
 			P0_DATA = 0x08;  		// Motor (P0.3) ein;  Motor M einschalten sobald Signal 1 an S3; Füllstand erreicht
