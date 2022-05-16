@@ -5,7 +5,6 @@
 #include <xc866.h>
 
 // ADC-Funktionen:
-
 		extern void adc_init(void);
 		extern unsigned int adc_in(unsigned char kanal);
 
@@ -23,13 +22,15 @@
 		unsigned char Wan[]="Waschmaschine An ";   	  // LCD-Text Waschmaschine An
 		unsigned char WS3[]="Wasserzulauf bis S3";    // LCD-Text Wasserzulauf bis S3
 		unsigned char Han[]="Heizung An";   	        // LCD-Text Heizung An
-		unsigned char Man[]="Motor An";   	          // LCD-Text Motor An
+//		unsigned char Hau[]="Heizung Aus";						// LCD-Text Heizun Aus; Auskommentiert, da Speicher zu klein
+//		unsigned char Man[]="Motor An";   	          // LCD-Text Motor An; Auskommentiert, da Spicher zu klein
+		unsigned char def[]="FEHLER";									// LCD-Text Fehler
 
 // Eigene Funktionen:
 		void init (void);
-		void zyklus1 (void);
+		void waschgang (void);
 		void teiler (void);							// Teilen in einzelne Ziffer
-		void warten (void);							// 5.461 msec. 
+		void timer (void);							// 5.461 msec. 
 		void zustand (void);						// LCD-Anzeige
 
 // Variablen:
@@ -46,7 +47,7 @@
 		unsigned int start = 0;	// (Steuersignal) Start
 		unsigned int ende = 0;	// (Steuersignal) Ende			
 		unsigned int p; 				// (Variable) 10sek.
-		unsigned int i;					// (Variable) LCD-Anzeige
+		unsigned int anzeige;		// (Variable) LCD-Anzeige
 
 		unsigned int temperatur_8;				// Temperatur 8_bit
 		unsigned int temperatur_10;			  // Temperatur 10_bit
@@ -57,7 +58,6 @@
 // Main
 //************************************************
 
-
 void main (void)
 {
 	init ();
@@ -65,7 +65,7 @@ void main (void)
 	{
 		zustand();
 		start = 1;
-		i = 0;
+		anzeige = 1;
 		while (temperatur_500 >= 300)
 		{
 			while (temperatur_500 >= 270)
@@ -75,10 +75,10 @@ void main (void)
 		}
 		if (S1==1)
 		{	
-			i = 2;
+			anzeige = 0;
 			if (start == 1)
 			{
-			zyklus1();
+			waschgang();
 			}
 		}
 		else
@@ -91,72 +91,79 @@ void main (void)
 // Funktionen
 //************************************************
 
-void zyklus1 (void)
+void waschgang (void)			// Funktion Waschgang
 {
-	if (S3 == 1)
+	if (S3 == 1)					  // Wenn Signal 1 an S3; Füllstand erreicht
 	{
-		P1_DATA =0x00;         // Wasserzulauf(P1.2) (Y) schließen
-		if (S2 == 0)
+		P1_DATA =0x00;        // Wasserzulauf(P1.2) (Y) schließen
+		if (S2 == 0)					// Wenn Wahlschaler (P3.1); Signal 0 an S2; Temperatur 60°C
 		{
-			if (S6 == 1)
+			if (S6 == 1)				// Wenn Signal 1 an S6; Temperatur 60°C erreicht
 			{
-			P1_DATA = 0x00;  // Heizung(P1.3) aus
-			P0_DATA = 0x08;  // Motor (P0.3) ein
-			TR0 = 1;
+			P1_DATA = 0x00;  		// Heizung(P1.3) aus; Heizung H ausschalten wenn 60°C erreicht sind
+			anzeige = 4;				// LCD-Text Heizung aus
+			P0_DATA = 0x08;  		// Motor (P0.3) ein;  Motor M einschalten sobald Signal 1 an S3; Füllstand erreicht
+			anzeige = 5;				// LCD-Text Motor an
+			TR0 = 1;						// Steuerbit für Zähler/Zeitgeber 0
 			}
-			else
+			else								// Sonst
 			{
-			P1_DATA = 0x08;	// Heizung(P1.3) ein
-			P0_DATA = 0x08; // Motor (P0.3) ein
+			P1_DATA = 0x08;			// Heizung(P1.3) ein; Heizung einschalten, wenn Temperatur unter 60°C sinkt
+			anzeige = 3;				// LCD-Text Heizung an
+			P0_DATA = 0x08;			// Motor (P0.3) ein;  Motor M ist weiterhin an
+			anzeige = 5;				// LCD-Text Motor an
 			}
 		}
-		else
+		else									// Sonst
 		{
-			if (S5 == 1)
+			if (S5 == 1)				// Signal 1 an S5; Temperatur 90°C erreicht					
 			{
-			P1_DATA = 0x00;  // Heizung(P1.3) aus
-			P0_DATA = 0x08;  // Motor (P0.3) ein
-			TR0 = 1;
+			P1_DATA = 0x00;  		// Heizung(P1.3) aus; Heizung H ausschalten wenn 90°C erreicht sind
+			anzeige = 4;				// LCD-Text Heizung aus
+			P0_DATA = 0x08;  		// Motor (P0.3) ein;  Motor M einschalten sobald Signal 1 an S3; Füllstand erreicht
+			anzeige = 5;				// LCD-Text Motor an
+			TR0 = 1;						// Steuerbit für Zähler/Zeitgeber 0
 			}
-			else
+			else								// Sonst
 			{
-			P1_DATA = 0x08;	// Heizung(P1.3) ein
-			P0_DATA = 0x08; // Motor (P0.3) ein
+			P1_DATA = 0x08;			// Heizung(P1.3) ein; Heizung einschalten, wenn Temperatur unter 90°C sinkt
+			anzeige = 4;				// LCD-Text Heizung an
+			P0_DATA = 0x08;			// Motor (P0.3) ein;  Motor M ist weiterhin an
+			anzeige = 5;				// LCD-Text Motor an
 			}
 		}		
 	}
-	else
+	else										// Sonst
 	  {
-	  P1_DATA = 0x04;				      //Wasserzulauf(P1.2) (Y) öffnen
-//		i = 1;
-//		zustand();
+	  P1_DATA = 0x04;				// Wasserzulauf(P1.2) (Y) öffnen
+		anzeige = 2;					// Anzeige Wasserzulauf
 		}
 } 
 
 void init (void)
 {
-	lcd_init();			// Initiierung des Bildschirms
-	lcd_clr();			// Löschen des Bildschirms
+	lcd_init();				// Initiierung des Bildschirms
+	lcd_clr();				// Löschen des Bildschirms
 	
-	P0_DIR = 0x18;	// P0.5 als Eingang, P0.4 und P0.3 als Ausgang
-	P1_DIR = 0xFF;
-	P3_DIR = 0x00;	
+	P0_DIR = 0x18;		// Port 0; P0.5 als Eingang, P0.4 und P0.3 als Ausgang
+	P1_DIR = 0xFF;		// Port 1; alles als Ausgang
+	P3_DIR = 0x00;		// Port 3; alles als Eingang
 	
-	P0_DATA = 0x00;
-	P1_DATA = 0x00;
-	P3_DATA = 0x00;
+	P0_DATA = 0x00;		// Port 0; Datenausgabe
+	P1_DATA = 0x00;		// Port 1; Datenausgabe
+	P3_DATA = 0x00;		// Port 3; Datenausgabe
 	
-	TMOD = 0x11;      // Timer 0 initialisiert
+	TMOD = 0x11;      // Timer 0 initialisiert; 16 Bit Zähler/Zeitgeber
 	
 	adc_init();				// ADC initialisieren
-	IRCON0=0;
 	
 	//Interrupt
-//	EXICON0=0xFF;
-//	IT0=1;
-	EX0 = 1;					//Ext. 0 Freigabe
-	ET0 = 1;					//Timer 0 Freigabe
-	EA = 1; 					// Globale Freigabe
+		//EXICON0=0xFF;		// Wenn aktiv; Schaltet Pumpe an direkt nach Neuem Booten des Programms; FEHLER
+		//IT0=1;					// Wenn aktiv; Schaltet Pumpe an direkt nach Neuem Booten des Programms; FEHLER
+		IRCON0=0;					// ????
+		EX0 = 1;					// Ext. 0 Freigabe
+		ET0 = 1;					// Timer 0 Freigabe
+		EA = 1; 					// Globale Freigabe
 }
 
 void teiler (void)
@@ -170,28 +177,28 @@ void teiler (void)
 	temperatur_8 = temperatur_10 >> 2;
 }
 
-void print (void)
-{
-	teiler ();
-	lcd_curs(1);							// Cursor auf Position 1 setzen
-	lcd_str("Temperatur: ");
-	asc_out(0x30 + H);				// Ausgabe H
-	asc_out(0x30 + Z);				// Ausgabe Z
-	lcd_str(",");
-	asc_out(0x30 + E);				// Ausgabe E
-	lcd_str("°C");
-	lcd_str("Start : ");
-	asc_out(0x30 + start);
-}
+//void print (void)
+//{
+//	teiler ();
+//	lcd_curs(1);							// Cursor auf Position 1 setzen
+//	lcd_str("Temperatur: ");
+//	asc_out(0x30 + H);				// Ausgabe H
+//	asc_out(0x30 + Z);				// Ausgabe Z
+//	lcd_str(",");
+//	asc_out(0x30 + E);				// Ausgabe E
+//	lcd_str("°C");
+//	lcd_str("Start : ");
+//	asc_out(0x30 + start);
+//}
 
-void warten (void)
+void timer (void)
 {
 	TF0 = 0;								// Timer-Flag auf 0 - bitaddresiert
 	TL0 = 0x00;							// Erste 8-binare - bitadresiert (start)
 	TH0 = 0x00;							// Zweite 8-binare - bitadresiert
 	TR0 = 1;								// Timer 0 starten - bitadresiert 
-	while (TF0 == 0);
-	TR0 = 0;								//Timer 0 stoppt - bitadressiert
+	while (TF0 == 0);				// Loop; Timerflag 0 = 0
+	TR0 = 0;								// Timer 0 stoppt - bitadressiert
 }
 
 void interrupt_switch_0 (void) interrupt 0
@@ -201,7 +208,7 @@ void interrupt_switch_0 (void) interrupt 0
 	P1_DATA = 0x10;  				// Pumpe (P1.4) an
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
 		{
-			warten();
+			timer();
 		}
 	P1_DATA = 0x00;  				// Pumpe (P1.4) aus	
 	IRCON0=0;
@@ -215,19 +222,19 @@ void interrupt_timer_0 (void) interrupt 1
 	TR0 = 0;								// Timer 0 stoppt
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
 		{
-			warten();
-			zyklus1();
+			timer();
+			waschgang();
 		}
 	P0_DATA = 0x18;  				// MSchleudern (P0.4) und Motor (P0.3) an
 	P1_DATA = 0x10;  				// Pumpe (P1.4) an
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
 	{
-		warten();
+		timer();
 	}
 	P1_DATA = 0x00;  				// Pumpe (P1.4) aus
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
 	{
-		warten();
+		timer();
 	}
 	P0_DATA = 0x00;  				// MSchleudern (P0.4) und Motor (P0.3) aus
 	TF0 = 0;								// Timer Flag 0
@@ -238,20 +245,36 @@ void interrupt_timer_0 (void) interrupt 1
 
 void zustand (void)
 {
-	switch(i)
+	switch(anzeige)
 	{
 		case 0:
 			lcd_curs(1);				// Cursor auf Position 1 setzen
-	    lcd_str(Waus);
-		  break;
-//	case 1:
-//		lcd_curs(20);				// Cursor auf Position 1 setzen
-//		lcd_str(WS3);
-//		break;
+	    lcd_str(Wan);				// LCD-Text Waschmaschine an
+		  break;							// Abschluss
+		case 1:
+			lcd_curs(1);				// Cursor auf Position 1 setzen
+	    lcd_str(Waus);			// LCD-Text Waschmaschine aus
+			break;							// Abschluss
+		case 2:
+			lcd_curs(20);				// Cursor auf Position 1 setzen
+			lcd_str(WS3);				// LCD-Text Wasserzulauf bis S3
+			break;							// Abschluss
+		case 3:
+			lcd_curs(20);				// Cursor auf Position 1 setzen
+			lcd_str(Han);				// LCD-Text Heizung an
+			break;							// Abschluss
+//		case 4:								// Auskommentiert, da Speicher zu klein
+//			lcd_curs(20);				// Cursor auf Position 1 setzen
+//			lcd_str(Hau);				// LCD-Text Heizung an
+//			break;							// Abschluss
+//		case 5:								// Auskommentiert, da Speicher zu klein
+//			lcd_curs(20);				// Cursor auf Position 1 setzen
+//			lcd_str(Man);				// LCD-Text Motor an
+//			break;							// Abschluss
 		default:
 			lcd_curs(1);				// Cursor auf Position 1 setzen
-	    lcd_str(Wan);
-			break;
+	    lcd_str(def);				// LCD-Text FEHLER
+			break;							// Abschluss
 	}
 }
 
