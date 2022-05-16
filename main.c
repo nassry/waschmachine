@@ -24,7 +24,7 @@
 		unsigned char Han[]="Heizung An";   	        // LCD-Text Heizung An
 //		unsigned char Hau[]="Heizung Aus";						// LCD-Text Heizun Aus; Auskommentiert, da Speicher zu klein
 //		unsigned char Man[]="Motor An";   	          // LCD-Text Motor An; Auskommentiert, da Spicher zu klein
-		unsigned char def[]="FEHLER";									// LCD-Text Fehler
+		unsigned char def[]="Fehler";									// LCD-Text Fehler
 
 // Eigene Funktionen:
 		void init (void);
@@ -66,7 +66,7 @@ void main (void)
 		zustand();
 		start = 1;
 		anzeige = 1;
-		P0_DATA = 0x00;
+		P1_DATA = 0x00;							//  Wasserzulauf(P1.2) (Y) schließen nach Timer-Interrupt 
 		while (temperatur_500 >= 300)
 		{
 			while (temperatur_500 >= 270)
@@ -74,7 +74,6 @@ void main (void)
 				start = 0;
 			}
 		}
-		
 		if (S1==1)
 		{	
 			anzeige = 0;
@@ -84,9 +83,6 @@ void main (void)
 			waschgang();
 			}
 		}
-		else
-		{
-		}	
 	}
 }
 
@@ -161,24 +157,23 @@ void init (void)
 	adc_init();				// ADC initialisieren
 	
 	//Interrupt
-		//EXICON0=0xFF;		// Wenn aktiv; Schaltet Pumpe an direkt nach Neuem Booten des Programms; FEHLER
-		//IT0=1;					// Wenn aktiv; Schaltet Pumpe an direkt nach Neuem Booten des Programms; FEHLER
-		IRCON0=0;					// ????
+		EXICON0=0x00;		// Fallende Flanken
+		IT0=0;					// Fallende Flanken 2-ter Freigabe
 		EX0 = 1;					// Ext. 0 Freigabe
 		ET0 = 1;					// Timer 0 Freigabe
 		EA = 1; 					// Globale Freigabe
 }
 
-void teiler (void)
-{
-	temperatur_10 = adc_in(4);
-	temperatur_500 = ( 500 * temperatur_10 ) / 1024 ;			// In temperatur_500 konvertieren
-	H = temperatur_500 / 100 ;														// Hundert
-	Z = ( temperatur_500 % 100 ) / 10 ;										// Zehn mit Rest von Hundert und durch 10
-	E = ( temperatur_500 % 100 ) % 10 ;										// Einzeln mit Rest von 10
-	
-	temperatur_8 = temperatur_10 >> 2;
-}
+//void teiler (void)
+//{
+//	temperatur_10 = adc_in(4);
+//	temperatur_500 = ( 500 * temperatur_10 ) / 1024 ;			// In temperatur_500 konvertieren
+//	H = temperatur_500 / 100 ;														// Hundert
+//	Z = ( temperatur_500 % 100 ) / 10 ;										// Zehn mit Rest von Hundert und durch 10
+//	E = ( temperatur_500 % 100 ) % 10 ;										// Einzeln mit Rest von 10
+//	
+//	temperatur_8 = temperatur_10 >> 2;
+//}
 
 //void print (void)
 //{
@@ -209,14 +204,14 @@ void interrupt_switch_0 (void) interrupt 0
 	P1_DATA = 0x00;  				// Heizung (P1.3)aus
 	P0_DATA = 0x00;  				// Motor (P0.3) aus
 	P1_DATA = 0x10;  				// Pumpe (P1.4) an
-	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
+	for(p=0; p<1831; p++)		// Warten-Funktion Pumpe für 10sek.
 		{
 			timer();
 		}
 	P1_DATA = 0x00;  				// Pumpe (P1.4) aus	
-	IRCON0=0;
+	IRCON0=0x00;
 	EA = 0;
-  while(S1==0);		
+  while(S1==0);	
 }
 
 void interrupt_timer_0 (void) interrupt 1
@@ -242,8 +237,9 @@ void interrupt_timer_0 (void) interrupt 1
 	P0_DATA = 0x00;  				// MSchleudern (P0.4) und Motor (P0.3) aus
 	TF0 = 0;								// Timer Flag 0
 	ET0 = 1;								// Timer 0 interruptbetrieb-Freigabe
-	EA = 0;
+	EA = 0;									// Freigabe zurücksetzen
 	while(S1==1);						// Programm Neustart
+	IRCON0=0x00;						// Flag zurücksetzen; durch Ausschalten betätigt.
 }
 
 void zustand (void)
