@@ -62,7 +62,6 @@ void main (void)
 	init ();
 	while(1)
 	{
-		EA = 0;
 		teiler();
 		zustand();
 		start = 1;
