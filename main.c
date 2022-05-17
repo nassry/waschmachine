@@ -201,6 +201,7 @@ void timer (void)
 
 void interrupt_switch_0 (void) interrupt 0
 {
+	EA = 0;
 	P1_DATA = 0x00;  				// Heizung (P1.3)aus
 	P0_DATA = 0x00;  				// Motor (P0.3) aus
 	P1_DATA = 0x10;  				// Pumpe (P1.4) an
@@ -210,7 +211,6 @@ void interrupt_switch_0 (void) interrupt 0
 		}
 	P1_DATA = 0x00;  				// Pumpe (P1.4) aus	
 	IRCON0=0x00;
-	EA = 0;
   while(S1==0);	
 }
 
