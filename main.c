@@ -18,12 +18,13 @@
 		extern void lcd_int(unsigned int);	// Ausgabe Int Wert => 4 stellig
 	 
 // Texte:
-		unsigned char Waus[]="Waschmaschine Aus";   	// LCD-Text Waschmaschine Aus
-		unsigned char Wan[]="Waschmaschine An ";   	  // LCD-Text Waschmaschine An
-		unsigned char WS3[]="Wasserzulauf bis S3";    // LCD-Text Wasserzulauf bis S3
-		unsigned char Han[]="Heizung An";   	        // LCD-Text Heizung An
-//		unsigned char Hau[]="Heizung Aus";						// LCD-Text Heizun Aus; Auskommentiert, da Speicher zu klein
-//		unsigned char Man[]="Motor An";   	          // LCD-Text Motor An; Auskommentiert, da Spicher zu klein
+		unsigned char Waus[]="Maschine Aus";   	// LCD-Text Waschmaschine Aus
+		unsigned char Wan[]="Maschine An ";   	  // LCD-Text Waschmaschine An
+		unsigned char WS3[]="Wasser bis S3";    // LCD-Text Wasserzulauf bis S3
+		unsigned char Han[]="H An";   	        // LCD-Text Heizung An
+		unsigned char Hau[]="H Aus";						// LCD-Text Heizun Aus; Auskommentiert, da Speicher zu klein
+		unsigned char Man[]="Mtr An";   	          // LCD-Text Motor An; Auskommentiert, da Spicher zu klein
+		unsigned char temp[]="Temp zu hoch";   	          // LCD-Text Motor An; Auskommentiert, da Spicher zu klein
 		unsigned char def[]="Fehler";									// LCD-Text Fehler
 
 // Eigene Funktionen:
@@ -44,15 +45,13 @@
 		unsigned int Y;         // (Steuersignal) Wasserzulauf
 		unsigned int H;         // (Steuersignal) Heizung
 		unsigned int M;         // (Steuersignal) Motor
-		unsigned int start = 0;	// (Steuersignal) Start
-		unsigned int ende = 0;	// (Steuersignal) Ende			
+		unsigned int start;	// (Steuersignal) Start
+		unsigned int ende;	// (Steuersignal) Ende			
 		unsigned int p; 				// (Variable) 10sek.
 		unsigned int anzeige;		// (Variable) LCD-Anzeige
 
-		unsigned int temperatur_8;				// Temperatur 8_bit
-		unsigned int temperatur_10;			  // Temperatur 10_bit
-		unsigned int temperatur_500;			// Temperatur 0-50,0°C
-		unsigned int H, Z, E, temperatur;	// Speicher für H,Z,E
+		unsigned long temperatur_10;			  // Temperatur 10_bit
+		unsigned long temperatur_500;			// Temperatur 0-50,0°C
 
 //************************************************
 // Main
@@ -63,6 +62,8 @@ void main (void)
 	init ();
 	while(1)
 	{
+		EA = 0;
+		teiler();
 		zustand();
 		start = 1;
 		anzeige = 1;
@@ -71,7 +72,10 @@ void main (void)
 		{
 			while (temperatur_500 >= 270)
 			{
+				teiler ();
 				start = 0;
+				anzeige = 6;
+				zustand();
 			}
 		}
 		if (S1==1)
@@ -164,16 +168,11 @@ void init (void)
 		EA = 1; 					// Globale Freigabe
 }
 
-//void teiler (void)
-//{
-//	temperatur_10 = adc_in(4);
-//	temperatur_500 = ( 500 * temperatur_10 ) / 1024 ;			// In temperatur_500 konvertieren
-//	H = temperatur_500 / 100 ;														// Hundert
-//	Z = ( temperatur_500 % 100 ) / 10 ;										// Zehn mit Rest von Hundert und durch 10
-//	E = ( temperatur_500 % 100 ) % 10 ;										// Einzeln mit Rest von 10
-//	
-//	temperatur_8 = temperatur_10 >> 2;
-//}
+void teiler (void)
+{
+	temperatur_10 = adc_in(4);
+	temperatur_500 = ( 500 * temperatur_10 ) / 1024 ;			// In temperatur_500 konvertieren
+}
 
 //void print (void)
 //{
@@ -201,7 +200,8 @@ void timer (void)
 
 void interrupt_switch_0 (void) interrupt 0
 {
-	EA = 0;
+	ET0 = 0;								// Timer 0 Freigabe löschen
+	TR0 = 0;								// Timer 0 stoppt
 	P1_DATA = 0x00;  				// Heizung (P1.3)aus
 	P0_DATA = 0x00;  				// Motor (P0.3) aus
 	P1_DATA = 0x10;  				// Pumpe (P1.4) an
@@ -210,8 +210,10 @@ void interrupt_switch_0 (void) interrupt 0
 			timer();
 		}
 	P1_DATA = 0x00;  				// Pumpe (P1.4) aus	
-	IRCON0=0x00;
   while(S1==0);	
+	IRCON0=0x00;
+	TF0 = 0;								// Timer Flag 0
+	ET0 = 1;								// Timer 0 interruptbetrieb-Freigabe
 }
 
 void interrupt_timer_0 (void) interrupt 1
@@ -262,14 +264,18 @@ void zustand (void)
 			lcd_curs(20);				// Cursor auf Position 1 setzen
 			lcd_str(Han);				// LCD-Text Heizung an
 			break;							// Abschluss
-//		case 4:								// Auskommentiert, da Speicher zu klein
-//			lcd_curs(20);				// Cursor auf Position 1 setzen
-//			lcd_str(Hau);				// LCD-Text Heizung an
-//			break;							// Abschluss
-//		case 5:								// Auskommentiert, da Speicher zu klein
-//			lcd_curs(20);				// Cursor auf Position 1 setzen
-//			lcd_str(Man);				// LCD-Text Motor an
-//			break;							// Abschluss
+		case 4:								// Auskommentiert, da Speicher zu klein
+			lcd_curs(20);				// Cursor auf Position 1 setzen
+			lcd_str(Hau);				// LCD-Text Heizung an
+			break;							// Abschluss
+		case 5:								// Auskommentiert, da Speicher zu klein
+			lcd_curs(20);				// Cursor auf Position 1 setzen
+			lcd_str(Man);				// LCD-Text Motor an
+			break;							// Abschluss
+		case 6:
+			lcd_curs(1);				// Cursor auf Position 1 setzen
+	    lcd_str(temp);				// LCD-Text Waschmaschine an
+		  break;							// Abschluss
 		default:
 			lcd_curs(1);				// Cursor auf Position 1 setzen
 	    lcd_str(def);				// LCD-Text FEHLER
