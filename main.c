@@ -22,9 +22,9 @@
 		unsigned char Wan[]="Maschine An ";   	// LCD-Text Waschmaschine An
 		unsigned char WS3[]="Wasser bis S3";    // LCD-Text Wasserzulauf bis S3
 		unsigned char Han[]="H An";   	        // LCD-Text Heizung An
-		unsigned char Hau[]="H Aus";						// LCD-Text Heizun Aus; Auskommentiert, da Speicher zu klein
-		unsigned char Man[]="Mtr An";   	      // LCD-Text Motor An; Auskommentiert, da Spicher zu klein
-		unsigned char temp[]="Temp. zu hoch";   	// LCD-Text Motor An; Auskommentiert, da Spicher zu klein
+		unsigned char Hau[]="H Aus";						// LCD-Text Heizun Aus
+		unsigned char Man[]="Mtr An";   	      // LCD-Text Motor An
+		unsigned char temp[]="Temp. zu hoch";   	// LCD-Text Motor An
 		unsigned char def[]="Fehler";						// LCD-Text Fehler
 
 // Eigene Funktionen:
