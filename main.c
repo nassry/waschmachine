@@ -19,13 +19,13 @@
 	 
 // Texte:
 		unsigned char Waus[]="Maschine Aus";   	// LCD-Text Waschmaschine Aus
-		unsigned char Wan[]="Maschine An ";   	  // LCD-Text Waschmaschine An
+		unsigned char Wan[]="Maschine An ";   	// LCD-Text Waschmaschine An
 		unsigned char WS3[]="Wasser bis S3";    // LCD-Text Wasserzulauf bis S3
 		unsigned char Han[]="H An";   	        // LCD-Text Heizung An
 		unsigned char Hau[]="H Aus";						// LCD-Text Heizun Aus; Auskommentiert, da Speicher zu klein
-		unsigned char Man[]="Mtr An";   	          // LCD-Text Motor An; Auskommentiert, da Spicher zu klein
-		unsigned char temp[]="Temp zu hoch";   	          // LCD-Text Motor An; Auskommentiert, da Spicher zu klein
-		unsigned char def[]="Fehler";									// LCD-Text Fehler
+		unsigned char Man[]="Mtr An";   	      // LCD-Text Motor An; Auskommentiert, da Spicher zu klein
+		unsigned char temp[]="Temp. zu hoch";   	// LCD-Text Motor An; Auskommentiert, da Spicher zu klein
+		unsigned char def[]="Fehler";						// LCD-Text Fehler
 
 // Eigene Funktionen:
 		void init (void);
@@ -45,12 +45,12 @@
 		unsigned int Y;         // (Steuersignal) Wasserzulauf
 		unsigned int H;         // (Steuersignal) Heizung
 		unsigned int M;         // (Steuersignal) Motor
-		unsigned int start;	// (Steuersignal) Start
-		unsigned int ende;	// (Steuersignal) Ende			
+		unsigned int start;			// (Steuersignal) Start
+		unsigned int ende;			// (Steuersignal) Ende			
 		unsigned int p; 				// (Variable) 10sek.
 		unsigned int anzeige;		// (Variable) LCD-Anzeige
 
-		unsigned long temperatur_10;			  // Temperatur 10_bit
+		unsigned long temperatur_10;			// Temperatur 10_bit
 		unsigned long temperatur_500;			// Temperatur 0-50,0°C
 
 //************************************************
@@ -160,8 +160,8 @@ void init (void)
 	adc_init();				// ADC initialisieren
 	
 	//Interrupt
-		EXICON0=0x00;		// Fallende Flanken
-		IT0=0;					// Fallende Flanken 2-ter Freigabe
+		EXICON0=0x00;			// Fallende Flanken
+		IT0=0;					  // Fallende Flanken 2-ter Freigabe
 		EX0 = 1;					// Ext. 0 Freigabe
 		ET0 = 1;					// Timer 0 Freigabe
 		EA = 1; 					// Globale Freigabe
@@ -248,35 +248,35 @@ void zustand (void)
 	switch(anzeige)
 	{
 		case 0:
-			lcd_curs(1);				// Cursor auf Position 1 setzen
+			lcd_curs(3);				// Cursor auf Position 1 setzen
 	    lcd_str(Wan);				// LCD-Text Waschmaschine an
 		  break;							// Abschluss
 		case 1:
-			lcd_curs(1);				// Cursor auf Position 1 setzen
+			lcd_curs(3);				// Cursor auf Position 1 setzen
 	    lcd_str(Waus);			// LCD-Text Waschmaschine aus
 			break;							// Abschluss
 		case 2:
-			lcd_curs(20);				// Cursor auf Position 1 setzen
+			lcd_curs(23);				// Cursor auf Position 1 setzen
 			lcd_str(WS3);				// LCD-Text Wasserzulauf bis S3
 			break;							// Abschluss
 		case 3:
-			lcd_curs(20);				// Cursor auf Position 1 setzen
+			lcd_curs(63);				// Cursor auf Position 1 setzen
 			lcd_str(Han);				// LCD-Text Heizung an
 			break;							// Abschluss
 		case 4:								// Auskommentiert, da Speicher zu klein
-			lcd_curs(20);				// Cursor auf Position 1 setzen
+			lcd_curs(63);				// Cursor auf Position 1 setzen
 			lcd_str(Hau);				// LCD-Text Heizung an
 			break;							// Abschluss
 		case 5:								// Auskommentiert, da Speicher zu klein
-			lcd_curs(20);				// Cursor auf Position 1 setzen
+			lcd_curs(43);				// Cursor auf Position 1 setzen
 			lcd_str(Man);				// LCD-Text Motor an
 			break;							// Abschluss
 		case 6:
-			lcd_curs(1);				// Cursor auf Position 1 setzen
-	    lcd_str(temp);				// LCD-Text Waschmaschine an
+			lcd_curs(63);				// Cursor auf Position 1 setzen
+	    lcd_str(temp);			// LCD-Text Temperatur zu hoch
 		  break;							// Abschluss
 		default:
-			lcd_curs(1);				// Cursor auf Position 1 setzen
+			lcd_curs(31);				// Cursor auf Position 1 setzen
 	    lcd_str(def);				// LCD-Text FEHLER
 			break;							// Abschluss
 	}
