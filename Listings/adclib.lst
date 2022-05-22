@@ -1,0 +1,81 @@
+C51 COMPILER V9.60.0.0   ADCLIB                                                            05/22/2022 05:55:42 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE ADCLIB
+OBJECT MODULE PLACED IN .\Objects\adclib.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE adclib.c OPTIMIZE(8,SPEED) BROWSE MODP2 DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\adclib.lst) TABS(2) OBJECT(.\Objects\adclib.obj)
+
+line level    source
+
+   1          // Birk Nov2007
+   2          // Bibliotheks Funktionen für ADC des XC866:
+   3          // einmal muss adcinit() aufgerufen werden,
+   4          // mit wert = ADCIN (kanal)  kann ein Analogwert in 10 Bit 
+   5          // Auflösung eingelsen werden . Kanal = 4 .. 7 möglich !!
+   6          
+   7          //  ADC Funktionen :
+   8          #include <xc866.h>
+   9          //*************************************++
+  10           // Prototypen:
+  11          void adc_init(void);
+  12          unsigned int adc_in (unsigned char kanal);
+  13          unsigned char ADC_Busy(void);
+  14          
+  15          //*******************************************
+  16          void adc_init(void)
+  17          {
+  18   1        SFR_PAGE(_ad0,noSST); // Page 0 aktiv 
+  19   1        ADC_GLOBCTR = 0x70; // ADC Global Control register
+  20   1        ADC_PRAR  = 0x90; // Prio und Arbitrationsreg
+  21   1        SFR_PAGE(_ad1,noSST); // Page 1 aktiv
+  22   1        ADC_CHCTR0  = 0x00; // Channel Control Register
+  23   1        SFR_PAGE(_ad0,noSST); // Page 0 aktiv
+  24   1        ADC_INPCR0  = 00; // Sample Time Control
+  25   1        SFR_PAGE(_ad4,noSST); // Page 4 aktiv
+  26   1        ADC_RCR0  = 0xc0; // Result Control Reg. 0
+  27   1        SFR_PAGE(_ad5,noSST); // Page 5 aktiv
+  28   1        ADC_CHINPR  = 0x00; // Channel Interrupt Node Pointer
+  29   1        ADC_EVINPR  = 0x00; // Event Interrupt Reg
+  30   1        SFR_PAGE(_ad0,noSST); // Page 0 aktiv
+  31   1        ADC_LCBR  = 0xb7  ; // Check boundery
+  32   1        ADC_ETRCR = 0x00  ; // Ext. Trigger Control
+  33   1        SFR_PAGE(_ad6,noSST); // Page 6 aktiv
+  34   1        ADC_QMR0  = 0x00;   //Queue Mode
+  35   1        ADC_CRMR1 = 0x01;   // Conv request
+  36   1        SFR_PAGE(_ad0,noSST); // Page 0 aktiv
+  37   1        ADC_GLOBCTR  |= 0x80; // On ADC
+  38   1      }
+  39          unsigned int adc_in(unsigned char kanal)
+  40          { // Kanal 4.. 7 ist möglich !
+  41   1         
+  42   1        ADC_PAGE = 0x06;
+  43   1        ADC_CRPR1= 1 << kanal ; // ANx gewählt 
+  44   1        while(ADC_Busy());
+  45   1        ADC_PAGE = 0x02;
+  46   1        return ((ADC_RESR0H<<2)+ (ADC_RESR0L>>6) );
+  47   1      }
+  48          unsigned char ADC_Busy(void)
+  49          { unsigned char bsyresult;
+  50   1      
+  51   1        SFR_PAGE(_ad0,SST1);  // Page 0 aktiv 
+  52   1        bsyresult = (ADC_GLOBSTR & 0x01);
+  53   1        SFR_PAGE(_ad0,RST1);  // Page 0 aktiv
+  54   1        return(bsyresult);
+C51 COMPILER V9.60.0.0   ADCLIB                                                            05/22/2022 05:55:42 PAGE 2   
+
+  55   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    113    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

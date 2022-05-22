@@ -1,0 +1,7 @@
+".\Objects\adclib.obj",
+".\Objects\DIP204_XC886.obj",
+".\Objects\main.obj" 
+TO ".\Objects\Waschmaschine" 
+PRINT(".\Listings\Waschmaschine.m51") RAMSIZE(256) 
+CODE( 0X0000-0X4FFF,0XA000-0XAFFF )
+XDATA( 0XF000-0XF5FF )
