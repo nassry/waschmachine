@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   MAIN                                                              05/22/2022 05:56:21 PAGE 1   
+C51 COMPILER V9.60.0.0   MAIN                                                              05/22/2022 08:09:42 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
@@ -56,13 +56,13 @@ line level    source
   46              unsigned int H;         // (Steuersignal) Heizung
   47              unsigned int M;         // (Steuersignal) Motor
   48              unsigned int start;     // (Steuersignal) Start
-  49              unsigned int ende;      // (Steuersignal) Ende      
+  49              unsigned int Ende;      // (Steuersignal) Ende      
   50              unsigned int p;         // (Variable) 10sek.
   51              unsigned int anzeige;   // (Variable) LCD-Anzeige
   52          
   53              unsigned long temperatur_10;      // Temperatur 10_bit
   54              unsigned long temperatur_500;     // Temperatur 0-50,0°C
-C51 COMPILER V9.60.0.0   MAIN                                                              05/22/2022 05:56:21 PAGE 2   
+C51 COMPILER V9.60.0.0   MAIN                                                              05/22/2022 08:09:42 PAGE 2   
 
   55          
   56          //************************************************
@@ -95,221 +95,231 @@ line level    source
   83   3            if (start == 1)
   84   3            {
   85   4            EA = 1;
-  86   4            waschgang();
-  87   4            }
-  88   3          }
-  89   2        }
-  90   1      }
-  91          
-  92          //************************************************
-  93          // Funktionen
-  94          //************************************************
-  95          
-  96          void waschgang (void)     // Funktion Waschgang
-  97          {
-  98   1        if (S3 == 1)            // Wenn Signal 1 an S3; Füllstand erreicht
-  99   1        {
- 100   2          P1_DATA =0x00;        // Wasserzulauf(P1.2) (Y) schließen
- 101   2          if (S2 == 0)          // Wenn Wahlschaler (P3.1); Signal 0 an S2; Temperatur 60°C
- 102   2          {
- 103   3            if (S6 == 1)        // Wenn Signal 1 an S6; Temperatur 60°C erreicht
- 104   3            {
- 105   4            P1_DATA = 0x00;     // Heizung(P1.3) aus; Heizung H ausschalten wenn 60°C erreicht sind
- 106   4            anzeige = 4;        // LCD-Text Heizung aus
- 107   4            P0_DATA = 0x08;     // Motor (P0.3) ein;  Motor M einschalten sobald Signal 1 an S3; Füllstand erreicht
- 108   4            anzeige = 5;        // LCD-Text Motor an
- 109   4            TR0 = 1;            // Steuerbit für Zähler/Zeitgeber 0
- 110   4            }
- 111   3            else                // Sonst
- 112   3            {
- 113   4            P1_DATA = 0x08;     // Heizung(P1.3) ein; Heizung einschalten, wenn Temperatur unter 60°C sinkt
- 114   4            anzeige = 3;        // LCD-Text Heizung an
- 115   4            P0_DATA = 0x08;     // Motor (P0.3) ein;  Motor M ist weiterhin an
- 116   4            anzeige = 5;        // LCD-Text Motor an
-C51 COMPILER V9.60.0.0   MAIN                                                              05/22/2022 05:56:21 PAGE 3   
+  86   4            Ende = 0;
+  87   4            waschgang();
+  88   4            }
+  89   3          }
+  90   2        }
+  91   1      }
+  92          
+  93          //************************************************
+  94          // Funktionen
+  95          //************************************************
+  96          
+  97          void waschgang (void)     // Funktion Waschgang
+  98          {
+  99   1        if (S3 == 1)            // Wenn Signal 1 an S3; Füllstand erreicht
+ 100   1        {
+ 101   2          P1_DATA =0x00;        // Wasserzulauf(P1.2) (Y) schließen
+ 102   2          if (S2 == 0)          // Wenn Wahlschaler (P3.1); Signal 0 an S2; Temperatur 60°C
+ 103   2          {
+ 104   3            if (S6 == 1)        // Wenn Signal 1 an S6; Temperatur 60°C erreicht
+ 105   3            {
+ 106   4            P1_DATA = 0x00;     // Heizung(P1.3) aus; Heizung H ausschalten wenn 60°C erreicht sind
+ 107   4            anzeige = 4;        // LCD-Text Heizung aus
+ 108   4            P0_DATA = 0x08;     // Motor (P0.3) ein;  Motor M einschalten sobald Signal 1 an S3; Füllstand erreicht
+ 109   4            anzeige = 5;        // LCD-Text Motor an
+ 110   4            TR0 = 1;            // Steuerbit für Zähler/Zeitgeber 0
+ 111   4            }
+ 112   3            else                // Sonst
+ 113   3            {
+ 114   4            P1_DATA = 0x08;     // Heizung(P1.3) ein; Heizung einschalten, wenn Temperatur unter 60°C sinkt
+ 115   4            anzeige = 3;        // LCD-Text Heizung an
+ 116   4            P0_DATA = 0x08;     // Motor (P0.3) ein;  Motor M ist weiterhin an
+C51 COMPILER V9.60.0.0   MAIN                                                              05/22/2022 08:09:42 PAGE 3   
 
- 117   4            }
- 118   3          }
- 119   2          else                  // Sonst
- 120   2          {
- 121   3            if (S5 == 1)        // Signal 1 an S5; Temperatur 90°C erreicht          
- 122   3            {
- 123   4            P1_DATA = 0x00;     // Heizung(P1.3) aus; Heizung H ausschalten wenn 90°C erreicht sind
- 124   4            anzeige = 4;        // LCD-Text Heizung aus
- 125   4            P0_DATA = 0x08;     // Motor (P0.3) ein;  Motor M einschalten sobald Signal 1 an S3; Füllstand erreicht
- 126   4            anzeige = 5;        // LCD-Text Motor an
- 127   4            TR0 = 1;            // Steuerbit für Zähler/Zeitgeber 0
- 128   4            }
- 129   3            else                // Sonst
- 130   3            {
- 131   4            P1_DATA = 0x08;     // Heizung(P1.3) ein; Heizung einschalten, wenn Temperatur unter 90°C sinkt
- 132   4            anzeige = 4;        // LCD-Text Heizung an
- 133   4            P0_DATA = 0x08;     // Motor (P0.3) ein;  Motor M ist weiterhin an
- 134   4            anzeige = 5;        // LCD-Text Motor an
- 135   4            }
- 136   3          }   
- 137   2        }
- 138   1        else                    // Sonst
- 139   1          {
- 140   2          P1_DATA = 0x04;       // Wasserzulauf(P1.2) (Y) öffnen
- 141   2          anzeige = 2;          // Anzeige Wasserzulauf
- 142   2          }
- 143   1      } 
- 144          
- 145          void init (void)
- 146          {
- 147   1        lcd_init();       // Initiierung des Bildschirms
- 148   1        lcd_clr();        // Löschen des Bildschirms
- 149   1        
- 150   1        P0_DIR = 0x18;    // Port 0; P0.5 als Eingang, P0.4 und P0.3 als Ausgang
- 151   1        P1_DIR = 0xFF;    // Port 1; alles als Ausgang
- 152   1        P3_DIR = 0x00;    // Port 3; alles als Eingang
- 153   1        
- 154   1        P0_DATA = 0x00;   // Port 0; Datenausgabe
- 155   1        P1_DATA = 0x00;   // Port 1; Datenausgabe
- 156   1        P3_DATA = 0x00;   // Port 3; Datenausgabe
- 157   1        
- 158   1        TMOD = 0x11;      // Timer 0 initialisiert; 16 Bit Zähler/Zeitgeber
- 159   1        
- 160   1        adc_init();       // ADC initialisieren
- 161   1        
- 162   1        //Interrupt
- 163   1          EXICON0=0x00;     // Fallende Flanken
- 164   1          IT0=0;            // Fallende Flanken 2-ter Freigabe
- 165   1          EX0 = 1;          // Ext. 0 Freigabe
- 166   1          ET0 = 1;          // Timer 0 Freigabe
- 167   1          EA = 1;           // Globale Freigabe
- 168   1      }
- 169          
- 170          void teiler (void)
- 171          {
- 172   1        temperatur_10 = adc_in(4);
- 173   1        temperatur_500 = ( 500 * temperatur_10 ) / 1024 ;     // In temperatur_500 konvertieren
- 174   1      }
- 175          
- 176          //void print (void)
- 177          //{
- 178          //  teiler ();
-C51 COMPILER V9.60.0.0   MAIN                                                              05/22/2022 05:56:21 PAGE 4   
+ 117   4            anzeige = 5;        // LCD-Text Motor an
+ 118   4            }
+ 119   3          }
+ 120   2          else                  // Sonst
+ 121   2          {
+ 122   3            if (S5 == 1)        // Signal 1 an S5; Temperatur 90°C erreicht          
+ 123   3            {
+ 124   4            P1_DATA = 0x00;     // Heizung(P1.3) aus; Heizung H ausschalten wenn 90°C erreicht sind
+ 125   4            anzeige = 4;        // LCD-Text Heizung aus
+ 126   4            P0_DATA = 0x08;     // Motor (P0.3) ein;  Motor M einschalten sobald Signal 1 an S3; Füllstand erreicht
+ 127   4            anzeige = 5;        // LCD-Text Motor an
+ 128   4            TR0 = 1;            // Steuerbit für Zähler/Zeitgeber 0
+ 129   4            }
+ 130   3            else                // Sonst
+ 131   3            {
+ 132   4            P1_DATA = 0x08;     // Heizung(P1.3) ein; Heizung einschalten, wenn Temperatur unter 90°C sinkt
+ 133   4            anzeige = 4;        // LCD-Text Heizung an
+ 134   4            P0_DATA = 0x08;     // Motor (P0.3) ein;  Motor M ist weiterhin an
+ 135   4            anzeige = 5;        // LCD-Text Motor an
+ 136   4            }
+ 137   3          }   
+ 138   2        }
+ 139   1        else                    // Sonst
+ 140   1          {
+ 141   2          P1_DATA = 0x04;       // Wasserzulauf(P1.2) (Y) öffnen
+ 142   2          anzeige = 2;          // Anzeige Wasserzulauf
+ 143   2          }
+ 144   1      } 
+ 145          
+ 146          void init (void)
+ 147          {
+ 148   1        lcd_init();       // Initiierung des Bildschirms
+ 149   1        lcd_clr();        // Löschen des Bildschirms
+ 150   1        
+ 151   1        P0_DIR = 0x18;    // Port 0; P0.5 als Eingang, P0.4 und P0.3 als Ausgang
+ 152   1        P1_DIR = 0xFF;    // Port 1; alles als Ausgang
+ 153   1        P3_DIR = 0x00;    // Port 3; alles als Eingang
+ 154   1        
+ 155   1        P0_DATA = 0x00;   // Port 0; Datenausgabe
+ 156   1        P1_DATA = 0x00;   // Port 1; Datenausgabe
+ 157   1        P3_DATA = 0x00;   // Port 3; Datenausgabe
+ 158   1        
+ 159   1        TMOD = 0x11;      // Timer 0 initialisiert; 16 Bit Zähler/Zeitgeber
+ 160   1        
+ 161   1        adc_init();       // ADC initialisieren
+ 162   1        
+ 163   1        //Interrupt
+ 164   1        IP = 1;           // Ex. Int 0 auf höchste Prioritätebene
+ 165   1        EXICON0=0x00;     // FallEnde Flanken
+ 166   1        IT0= 0;           // FallEnde Flanken 2-ter Freigabe
+ 167   1        EX0 = 1;          // Ext. 0 Freigabe
+ 168   1        ET0 = 1;          // Timer 0 Freigabe
+ 169   1        EA = 1;           // Globale Freigabe
+ 170   1      }
+ 171          
+ 172          void teiler (void)
+ 173          {
+ 174   1        temperatur_10 = adc_in(4);
+ 175   1        temperatur_500 = ( 500 * temperatur_10 ) / 1024 ;     // In temperatur_500 konvertieren
+ 176   1      }
+ 177          
+ 178          //void print (void)
+C51 COMPILER V9.60.0.0   MAIN                                                              05/22/2022 08:09:42 PAGE 4   
 
- 179          //  lcd_curs(1);              // Cursor auf Position 1 setzen
- 180          //  lcd_str("Temperatur: ");
- 181          //  asc_out(0x30 + H);        // Ausgabe H
- 182          //  asc_out(0x30 + Z);        // Ausgabe Z
- 183          //  lcd_str(",");
- 184          //  asc_out(0x30 + E);        // Ausgabe E
- 185          //  lcd_str("°C");
- 186          //  lcd_str("Start : ");
- 187          //  asc_out(0x30 + start);
- 188          //}
- 189          
- 190          void timer (void)
- 191          {
- 192   1        TF0 = 0;                // Timer-Flag auf 0 - bitaddresiert
- 193   1        TL0 = 0x00;             // Erste 8-binare - bitadresiert (start)
- 194   1        TH0 = 0x00;             // Zweite 8-binare - bitadresiert
- 195   1        TR0 = 1;                // Timer 0 starten - bitadresiert 
- 196   1        while (TF0 == 0);       // Loop; Timerflag 0 = 0
- 197   1        TR0 = 0;                // Timer 0 stoppt - bitadressiert
- 198   1      }
- 199          
- 200          void interrupt_switch_0 (void) interrupt 0
- 201          {
- 202   1        ET0 = 0;                // Timer 0 Freigabe löschen
- 203   1        TR0 = 0;                // Timer 0 stoppt
- 204   1        P1_DATA = 0x00;         // Heizung (P1.3)aus
- 205   1        P0_DATA = 0x00;         // Motor (P0.3) aus
- 206   1        P1_DATA = 0x10;         // Pumpe (P1.4) an
- 207   1        for(p=0; p<1831; p++)   // Warten-Funktion Pumpe für 10sek.
- 208   1          {
- 209   2            timer();
- 210   2          }
- 211   1        P1_DATA = 0x00;         // Pumpe (P1.4) aus 
- 212   1        while(S1==0); 
- 213   1        IRCON0=0x00;
- 214   1        TF0 = 0;                // Timer Flag 0
- 215   1        ET0 = 1;                // Timer 0 interruptbetrieb-Freigabe
- 216   1      }
- 217          
- 218          void interrupt_timer_0 (void) interrupt 1
- 219          {
- 220   1        ET0 = 0;                // Timer 0 Freigabe löschen
- 221   1        TR0 = 0;                // Timer 0 stoppt
- 222   1        for(p=0; p<1860; p++)   // Warten-Funktion Pumpe für 10sek.
- 223   1          {
- 224   2            timer();
- 225   2            waschgang();
- 226   2          }
- 227   1        P0_DATA = 0x18;         // MSchleudern (P0.4) und Motor (P0.3) an
- 228   1        P1_DATA = 0x10;         // Pumpe (P1.4) an
- 229   1        for(p=0; p<1860; p++)   // Warten-Funktion Pumpe für 10sek.
- 230   1        {
- 231   2          timer();
- 232   2        }
- 233   1        P1_DATA = 0x00;         // Pumpe (P1.4) aus
- 234   1        for(p=0; p<1860; p++)   // Warten-Funktion Pumpe für 10sek.
- 235   1        {
- 236   2          timer();
- 237   2        }
- 238   1        P0_DATA = 0x00;         // MSchleudern (P0.4) und Motor (P0.3) aus
- 239   1        TF0 = 0;                // Timer Flag 0
- 240   1        ET0 = 1;                // Timer 0 interruptbetrieb-Freigabe
-C51 COMPILER V9.60.0.0   MAIN                                                              05/22/2022 05:56:21 PAGE 5   
+ 179          //{
+ 180          //  teiler ();
+ 181          //  lcd_curs(1);              // Cursor auf Position 1 setzen
+ 182          //  lcd_str("Temperatur: ");
+ 183          //  asc_out(0x30 + H);        // Ausgabe H
+ 184          //  asc_out(0x30 + Z);        // Ausgabe Z
+ 185          //  lcd_str(",");
+ 186          //  asc_out(0x30 + E);        // Ausgabe E
+ 187          //  lcd_str("°C");
+ 188          //  lcd_str("Start : ");
+ 189          //  asc_out(0x30 + start);
+ 190          //}
+ 191          
+ 192          void timer (void)
+ 193          {
+ 194   1        TF0 = 0;                // Timer-Flag auf 0 - bitaddresiert
+ 195   1        TL0 = 0x00;             // Erste 8-binare - bitadresiert (start)
+ 196   1        TH0 = 0x00;             // Zweite 8-binare - bitadresiert
+ 197   1        TR0 = 1;                // Timer 0 starten - bitadresiert 
+ 198   1        while (TF0 == 0);
+ 199   1        TR0 = 0;                // Timer 0 stoppt - bitadressiert
+ 200   1      }
+ 201          
+ 202          void interrupt_switch_0 (void) interrupt 0
+ 203          {
+ 204   1        Ende = 1;
+ 205   1        ET0 = 0;                // Timer 0 Freigabe löschen
+ 206   1        TR0 = 0;                // Timer 0 stoppt
+ 207   1        P1_DATA = 0x00;         // Heizung (P1.3)aus
+ 208   1        P0_DATA = 0x00;         // Motor (P0.3) aus
+ 209   1        P1_DATA = 0x10;         // Pumpe (P1.4) an
+ 210   1        for(p=0; p<1831; p++)   // Warten-Funktion Pumpe für 10sek.
+ 211   1          {
+ 212   2            timer();
+ 213   2          }
+ 214   1        P1_DATA = 0x00;         // Pumpe (P1.4) aus
+ 215   1        while(S1==0); 
+ 216   1        IRCON0=0x00;
+ 217   1        TF0 = 0;                // Timer Flag 0
+ 218   1        if (Ende == 1)
+ 219   1          {
+ 220   2            TR0 = 1;
+ 221   2            return;
+ 222   2          }
+ 223   1      }
+ 224          
+ 225          void interrupt_timer_0 (void) interrupt 1
+ 226          {
+ 227   1        Ende = 1;
+ 228   1        ET0 = 0;                // Timer 0 Freigabe löschen
+ 229   1        TR0 = 0;                // Timer 0 stoppt
+ 230   1        for(p=0; p<1860; p++)   // Warten-Funktion Pumpe für 10sek.
+ 231   1          {
+ 232   2            timer();
+ 233   2            waschgang();
+ 234   2          }
+ 235   1        P0_DATA = 0x18;         // MSchleudern (P0.4) und Motor (P0.3) an
+ 236   1        P1_DATA = 0x10;         // Pumpe (P1.4) an
+ 237   1        for(p=0; p<1860; p++)   // Warten-Funktion Pumpe für 10sek.
+ 238   1        {
+ 239   2          timer();
+ 240   2        }
+C51 COMPILER V9.60.0.0   MAIN                                                              05/22/2022 08:09:42 PAGE 5   
 
- 241   1        EA = 0;                 // Freigabe zurücksetzen
- 242   1        while(S1==1);           // Programm Neustart
- 243   1        IRCON0=0x00;            // Flag zurücksetzen; durch Ausschalten betätigt.
- 244   1      }
- 245          
- 246          void zustand (void)
- 247          {
- 248   1        switch(anzeige)
- 249   1        {
- 250   2          case 0:
- 251   2            lcd_curs(3);        // Cursor auf Position 1 setzen
- 252   2            lcd_str(Wan);       // LCD-Text Waschmaschine an
- 253   2            break;              // Abschluss
- 254   2          case 1:
- 255   2            lcd_curs(3);        // Cursor auf Position 1 setzen
- 256   2            lcd_str(Waus);      // LCD-Text Waschmaschine aus
- 257   2            break;              // Abschluss
- 258   2          case 2:
- 259   2            lcd_curs(23);       // Cursor auf Position 1 setzen
- 260   2            lcd_str(WS3);       // LCD-Text Wasserzulauf bis S3
+ 241   1        P1_DATA = 0x00;         // Pumpe (P1.4) aus
+ 242   1        for(p=0; p<1860; p++)   // Warten-Funktion Pumpe für 10sek.
+ 243   1        {
+ 244   2          timer();
+ 245   2        }
+ 246   1        P0_DATA = 0x00;         // MSchleudern (P0.4) und Motor (P0.3) aus
+ 247   1        TF0 = 0;                // Timer Flag 0
+ 248   1        ET0 = 1;                // Timer 0 interruptbetrieb-Freigabe
+ 249   1        EA = 0;                 // Freigabe zurücksetzen
+ 250   1        while(S1==1);           // Programm Neustart
+ 251   1        IRCON0=0x00;            // Flag zurücksetzen; durch Ausschalten betätigt.
+ 252   1      }
+ 253          
+ 254          void zustand (void)
+ 255          {
+ 256   1        switch(anzeige)
+ 257   1        {
+ 258   2          case 0:
+ 259   2            lcd_curs(3);        // Cursor auf Position 1 setzen
+ 260   2            lcd_str(Wan);       // LCD-Text Waschmaschine an
  261   2            break;              // Abschluss
- 262   2          case 3:
- 263   2            lcd_curs(63);       // Cursor auf Position 1 setzen
- 264   2            lcd_str(Han);       // LCD-Text Heizung an
+ 262   2          case 1:
+ 263   2            lcd_curs(3);        // Cursor auf Position 1 setzen
+ 264   2            lcd_str(Waus);      // LCD-Text Waschmaschine aus
  265   2            break;              // Abschluss
- 266   2          case 4:               // Auskommentiert, da Speicher zu klein
- 267   2            lcd_curs(63);       // Cursor auf Position 1 setzen
- 268   2            lcd_str(Hau);       // LCD-Text Heizung an
+ 266   2          case 2:
+ 267   2            lcd_curs(23);       // Cursor auf Position 1 setzen
+ 268   2            lcd_str(WS3);       // LCD-Text Wasserzulauf bis S3
  269   2            break;              // Abschluss
- 270   2          case 5:               // Auskommentiert, da Speicher zu klein
- 271   2            lcd_curs(43);       // Cursor auf Position 1 setzen
- 272   2            lcd_str(Man);       // LCD-Text Motor an
+ 270   2          case 3:
+ 271   2            lcd_curs(63);       // Cursor auf Position 1 setzen
+ 272   2            lcd_str(Han);       // LCD-Text Heizung an
  273   2            break;              // Abschluss
- 274   2          case 6:
+ 274   2          case 4:               // Auskommentiert, da Speicher zu klein
  275   2            lcd_curs(63);       // Cursor auf Position 1 setzen
- 276   2            lcd_str(temp);      // LCD-Text Temperatur zu hoch
+ 276   2            lcd_str(Hau);       // LCD-Text Heizung an
  277   2            break;              // Abschluss
- 278   2          default:
- 279   2            lcd_curs(31);       // Cursor auf Position 1 setzen
- 280   2            lcd_str(def);       // LCD-Text FEHLER
+ 278   2          case 5:               // Auskommentiert, da Speicher zu klein
+ 279   2            lcd_curs(43);       // Cursor auf Position 1 setzen
+ 280   2            lcd_str(Man);       // LCD-Text Motor an
  281   2            break;              // Abschluss
- 282   2        }
- 283   1      }
- 284          
+ 282   2          case 6:
+ 283   2            lcd_curs(63);       // Cursor auf Position 1 setzen
+ 284   2            lcd_str(temp);      // LCD-Text Temperatur zu hoch
+ 285   2            break;              // Abschluss
+ 286   2          default:
+ 287   2            lcd_curs(31);       // Cursor auf Position 1 setzen
+ 288   2            lcd_str(def);       // LCD-Text FEHLER
+ 289   2            break;              // Abschluss
+ 290   2        }
+ 291   1      }
+ 292          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    613    ----
+   CODE SIZE        =    640    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =    101    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
+C51 COMPILER V9.60.0.0   MAIN                                                              05/22/2022 08:09:42 PAGE 6   
+
 END OF MODULE INFORMATION.
 
 

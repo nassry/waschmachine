@@ -46,7 +46,7 @@
 		unsigned int H;         // (Steuersignal) Heizung
 		unsigned int M;         // (Steuersignal) Motor
 		unsigned int start;			// (Steuersignal) Start
-		unsigned int ende;			// (Steuersignal) Ende			
+		unsigned int Ende;			// (Steuersignal) Ende			
 		unsigned int p; 				// (Variable) 10sek.
 		unsigned int anzeige;		// (Variable) LCD-Anzeige
 
@@ -83,6 +83,7 @@ void main (void)
 			if (start == 1)
 			{
 			EA = 1;
+			Ende = 0;
 			waschgang();
 			}
 		}
@@ -160,11 +161,12 @@ void init (void)
 	adc_init();				// ADC initialisieren
 	
 	//Interrupt
-		EXICON0=0x00;			// Fallende Flanken
-		IT0=0;					  // Fallende Flanken 2-ter Freigabe
-		EX0 = 1;					// Ext. 0 Freigabe
-		ET0 = 1;					// Timer 0 Freigabe
-		EA = 1; 					// Globale Freigabe
+	IP = 1;						// Ex. Int 0 auf höchste Prioritätebene
+	EXICON0=0x00;			// FallEnde Flanken
+	IT0= 0;					  // FallEnde Flanken 2-ter Freigabe
+	EX0 = 1;					// Ext. 0 Freigabe
+	ET0 = 1;					// Timer 0 Freigabe
+	EA = 1; 					// Globale Freigabe
 }
 
 void teiler (void)
@@ -193,12 +195,13 @@ void timer (void)
 	TL0 = 0x00;							// Erste 8-binare - bitadresiert (start)
 	TH0 = 0x00;							// Zweite 8-binare - bitadresiert
 	TR0 = 1;								// Timer 0 starten - bitadresiert 
-	while (TF0 == 0);				// Loop; Timerflag 0 = 0
+	while (TF0 == 0);
 	TR0 = 0;								// Timer 0 stoppt - bitadressiert
 }
 
 void interrupt_switch_0 (void) interrupt 0
 {
+	Ende = 1;
 	ET0 = 0;								// Timer 0 Freigabe löschen
 	TR0 = 0;								// Timer 0 stoppt
 	P1_DATA = 0x00;  				// Heizung (P1.3)aus
@@ -208,15 +211,19 @@ void interrupt_switch_0 (void) interrupt 0
 		{
 			timer();
 		}
-	P1_DATA = 0x00;  				// Pumpe (P1.4) aus	
+	P1_DATA = 0x00;  				// Pumpe (P1.4) aus
   while(S1==0);	
 	IRCON0=0x00;
 	TF0 = 0;								// Timer Flag 0
-	ET0 = 1;								// Timer 0 interruptbetrieb-Freigabe
+	if (Ende == 1)
+		{
+			TR0 = 1;
+		}
 }
 
 void interrupt_timer_0 (void) interrupt 1
 {
+	Ende = 1;
 	ET0 = 0;								// Timer 0 Freigabe löschen
 	TR0 = 0;								// Timer 0 stoppt
 	for(p=0; p<1860; p++)		// Warten-Funktion Pumpe für 10sek.
