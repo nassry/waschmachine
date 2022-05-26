@@ -10,7 +10,7 @@
 
 // LCD Funktionen:
 		extern void lcd_init(void);		      // Init LCD
-		extern void lcd_clr(void);	 	     	// LCD Löschen 
+		extern void lcd_clr(void);	 	     	// LCD LÃ¶schen 
 		extern void lcd_str(char *ptr);	    // Ausgabe String
 		extern void lcd_curs(char);		      // Cursor setzen
 		extern void lcd_int(unsigned int);	// Ausgabe Int Wert => 4 stellig
@@ -22,21 +22,20 @@
 		unsigned char M[]="Motor";   	   	 			// LCD-Text Motor An
 		unsigned char Schl[]="Schleudern";   	  // LCD-Text Motor An
 		unsigned char Pumpe[]="Pumpe";					// LCD-Text Pumpe An
-		unsigned char temp[]="°C Zu Hoch";  	 	// LCD-Text Temperatur zu hoch
-		unsigned char Wab[]="Error";		  			// LCD-Text Waschabbruch
+		unsigned char temp[]="T Zu Hoch";  	 		// LCD-Text Temperatur zu hoch
 		unsigned char An[]="An";								// LCD-Text An					
 		unsigned char Aus[]="Aus";							// LCD-Text Aus
 		unsigned char Auf[]="Auf";							// LCD-Text Auf					
 		unsigned char Zu[]="Zu";								// LCD-Text Zu
-		unsigned char Leer[]=" ";								// LCD-Text Text Löschen
+		unsigned char Leer[]=" ";								// LCD-Text Text LÃ¶schen
 		
 
 // Eigene Funktionen:
 		void init (void);																// Initialisierung
-		void reset_timer(void);													// Funktion Timer zurücksetzten
+		void reset_timer(void);													// Funktion Timer zurÃ¼cksetzten
 		void stoppuhr(void);														// Funktion Stoppuhr
-		void teiler (void);															// Funktion teiler für Umgebungstemperatur
-		void temp_ueberwachung(void);										// Temperaturüberwachung für Umgebung
+		void teiler (void);															// Funktion teiler fÃ¼r Umgebungstemperatur
+		void temp_ueberwachung(void);										// TemperaturÃ¼berwachung fÃ¼r Umgebung
 		void waschgang(void);														// Funktion Waschgang
 		void maschine_an(void);													// Funktion Maschine an
 		void maschine_aus(void);												// Funktion Maschine aus
@@ -60,21 +59,21 @@
 // Variablen:
 		sbit S1 = P0_DATA^5;    // (Schalter) Hauptschalter - Interruptbetrieb EXT0
 		sbit S2 = P3_DATA^1;    // (Sensor) Temperatur Schalter
-		sbit S3 = P3_DATA^2;    // (Sensor) Fühlstand erreicht
-		sbit S4 = P3_DATA^3;    // (Sensor) Füllstand überschritten
+		sbit S3 = P3_DATA^2;    // (Sensor) FÃ¼hlstand erreicht
+		sbit S4 = P3_DATA^3;    // (Sensor) FÃ¼llstand Ã¼berschritten
 		sbit S5 = P3_DATA^4;    // (Signal) 90 grad
 		sbit S6 = P3_DATA^5;    // (Signal) 60 grad
 	
 	
 		unsigned int zustand;					// (Variable) LCD-Anzeige
-		unsigned int timer_1;					// Zeit für 1 Sekunde
-		unsigned int zeitpluseins;		// Zählt Ticks
+		unsigned int timer_1;					// Zeit fÃ¼r 1 Sekunde
+		unsigned int zeitpluseins;		// ZÃ¤hlt Ticks
 		unsigned int start;						// Programmstart
 		unsigned int ende; 						// Programmende
 		unsigned int i;								// Variable i
 
 		unsigned long temperatur_10;		// Temperatur 10_bit
-		unsigned long temperatur_500;		// Temperatur 0-50,0°C
+		unsigned long temperatur_500;		// Temperatur 0-50,0Â°C
 
 //************************************************
 // Main
@@ -101,7 +100,7 @@ void main (void)						// Funktion Main
 void init (void)									// Funktion Initialisierung
 {
 	lcd_init();					// Initiierung des Bildschirms
-	lcd_clr();					// Löschen des Bildschirms
+	lcd_clr();					// LÃ¶schen des Bildschirms
 	
 	P0_DIR = 0x18;			// Port 0; P0.5 als Eingang, P0.4 und P0.3 als Ausgang
 	P1_DIR = 0xFF;			// Port 1; alles als Ausgang
@@ -111,19 +110,19 @@ void init (void)									// Funktion Initialisierung
 	P1_DATA = 0x00;			// Port 1; Datenausgabe
 	P3_DATA = 0x00;			// Port 3; Datenausgabe
 	
-	TMOD = 0x11;     		// Timer 0 initialisiert; 16 Bit Zähler/Zeitgeber
+	TMOD = 0x11;     		// Timer 0 initialisiert; 16 Bit ZÃ¤hler/Zeitgeber
 
 	adc_init();					// ADC initialisieren
 	
-	zustand = 0;				// Zurücksetzten von switch(zustand)
+	zustand = 0;				// ZurÃ¼cksetzten von switch(zustand)
 	
-	zeitpluseins = 0;		// Initialisiierung zähler Ticks
+	zeitpluseins = 0;		// Initialisiierung zÃ¤hler Ticks
 	
 	start = 1;					// Programmstart
 	ende = 0;						// Programmende
 	
 	//Interrupt
-		IP = 1;						// Ex. Interrupt 0 auf höchste Prio
+		IP = 1;						// Ex. Interrupt 0 auf hÃ¶chste Prio
 		EXICON0=0x00;			// Fallende Flanken
 		IT0=0;					  // Fallende Flanken 2-ter Freigabe
 		EX0 = 1;					// Ext. 0 Freigabe
@@ -133,65 +132,65 @@ void init (void)									// Funktion Initialisierung
 
 void maschine_an(void)						// Funktion Maschine an P0.5
 {
-	lcd_curs(3);										// Cursor auf Position 1 setzen
+	lcd_curs(3);										// Cursor auf Position setzen
 	lcd_str(Masch);									// LCD-Text Maschine
-	lcd_curs(12);										// Cursor auf Position 1 setzen
+	lcd_curs(12);										// Cursor auf Position setzen
 	lcd_str(An);										// LCD-Text An
-	text_loeschen(14, 15);					// LCD-Text Löschen
+	text_loeschen(14, 15);					// LCD-Text LÃ¶schen
 }	
 
 void maschine_aus(void)						// Funktion Maschine aus P0.5
 {
-	lcd_curs(3);										// Cursor auf Position 1 setzen
+	lcd_curs(3);										// Cursor auf Position setzen
 	lcd_str(Masch);									// LCD-Text Maschine
-	lcd_curs(12);										// Cursor auf Position 1 setzen
+	lcd_curs(12);										// Cursor auf Position setzen
 	lcd_str(Aus);										// LCD-Text Masch. Aus
 }	
 
 void ventil_auf(void)							// Funktion Ventil auf P1.2
 {
 	P1_DATA = 0x04;									// Port 1 P1.2
-	lcd_curs(23);										// Cursor auf Position 1 setzen
+	lcd_curs(23);										// Cursor auf Position setzen
 	lcd_str(Y);											// LCD-Text Ventil
-	lcd_curs(30);										// Cursor auf Position 1 setzen
+	lcd_curs(30);										// Cursor auf Position setzen
 	lcd_str(Auf);										// LCD-Text Auf
 }	
 
 void ventil_zu(void)							// Funktion Ventil zu P1.2
 {
 	P1_DATA =0x00;									// Port 0 alles aus
-	lcd_curs(23);										// Cursor auf Position 1 setzen
+	lcd_curs(23);										// Cursor auf Position setzen
 	lcd_str(Y);											// LCD-Text Ventil
-	lcd_curs(30);										// Cursor auf Position 1 setzen
+	lcd_curs(30);										// Cursor auf Position setzen
 	lcd_str(Zu);										// LCD-Text Zu
-	text_loeschen(32, 33);					// LCD-Text Löschen
+	text_loeschen(32, 33);					// LCD-Text LÃ¶schen
 }
 
 void motor_anschalten (void)			// Funktion Motor anschalten P0.3
 {
 	P0_DATA = 0x08;									// Port 0 P0.3
-	lcd_curs(43);										// Cursor auf Position 1 setzen
+	lcd_curs(43);										// Cursor auf Position setzen
 	lcd_str(M);											// LCD-Text Motor
-	lcd_curs(49);										// Cursor auf Position 1 setzen
+	lcd_curs(49);										// Cursor auf Position setzen
 	lcd_str(An);										// LCD-Text An
-	text_loeschen(51, 63);					// LCD-Text Löschen
+	text_loeschen(51, 63);					// LCD-Text LÃ¶schen
 }
 
 void motor_ausschalten (void)			// Funktion Motor ausschalten P0.3
 {
 	P0_DATA = 0x00;									// Port 0 alles aus
-  lcd_curs(43);										// Cursor auf Position 1 setzen
+  lcd_curs(43);										// Cursor auf Position setzen
 	lcd_str(M);											// LCD-Text Motor
-	lcd_curs(49);										// Cursor auf Position 1 setzen
+	lcd_curs(49);										// Cursor auf Position setzen
 	lcd_str(Aus);										// LCD-Text Aus
-	text_loeschen(52, 63);					// LCD-Text Löschen	
+	text_loeschen(52, 63);					// LCD-Text LÃ¶schen	
 }
 void motor_schleudern_an(void)		// Funktion Motor schleudern an P0.4
 {
 	P0_DATA = 0x18;									// Port 0 P.04
-	lcd_curs(43);										// Cursor auf Position 1 setzen
+	lcd_curs(43);										// Cursor auf Position setzen
 	lcd_str(M);											// LCD-Text Motor
-	lcd_curs(49);										// Cursor auf Position 1 setzen
+	lcd_curs(49);										// Cursor auf Position setzen
 	lcd_str(Schl);									// LCD-Text Schleudern
 }
 	
@@ -203,67 +202,67 @@ void motor_schleudern_aus(void)		// Funktion Motor schleudern aus P0.3
 void heizung_anschalten (void)		// Funktion Heizung anschalten P1.3
 {
 	P1_DATA = 0x08;									// Port 1 P1.3
-	lcd_curs(63);										// Cursor auf Position 1 setzen
+	lcd_curs(63);										// Cursor auf Position setzen
 	lcd_str(H);											// LCD-Text Heizung
-	text_loeschen(70, 71);					// LCD-Text Löschen
-	lcd_curs(71);										// Cursor auf Position 1 setzen
+	text_loeschen(70, 71);					// LCD-Text LÃ¶schen
+	lcd_curs(71);										// Cursor auf Position setzen
 	lcd_str(An);										// LCD-Text An
-	text_loeschen(73, 74);					// LCD-Text Löschen
+	text_loeschen(73, 74);					// LCD-Text LÃ¶schen
 }
 void heizung_ausschalten (void)		// Funktion Heizung ausschalten P1.3
 {
 	P1_DATA = 0x00;									// Port 1 alles aus
-	lcd_curs(63);										// Cursor auf Position 1 setzen
+	lcd_curs(63);										// Cursor auf Position setzen
 	lcd_str(H);											// LCD-Text Heizung
-	text_loeschen(70, 71);					// LCD-Text Löschen
-	lcd_curs(71);										// Cursor auf Position 1 setzen
+	text_loeschen(70, 71);					// LCD-Text LÃ¶schen
+	lcd_curs(71);										// Cursor auf Position setzen
 	lcd_str(Aus);										// LCD-Text Aus
 }
 
 void pumpe_anschalten(void)				// Funktion Pumpe anschalten P1.4
 {
 	P1_DATA = 0x10;									// Port 1 P1.4
-	lcd_curs(63);										// Cursor auf Position 1 setzen
+	lcd_curs(63);										// Cursor auf Position setzen
 	lcd_str(Pumpe);									// LCD-Text Pumpe
-	text_loeschen(68, 69);					// LCD-Text Löschen	
-	lcd_curs(69);										// Cursor auf Position 1 setzen
+	text_loeschen(68, 69);					// LCD-Text LÃ¶schen	
+	lcd_curs(69);										// Cursor auf Position setzen
 	lcd_str(An);										// LCD-Text An
-	text_loeschen(71, 74);					// LCD-Text Löschen	
+	text_loeschen(71, 74);					// LCD-Text LÃ¶schen	
 }
 void pumpe_ausschalten(void)			// Funktion Pumpe ausschalten P1.4
 {
 	P1_DATA = 0x00;									// Port 1 alles aus
-	lcd_curs(63);										// Cursor auf Position 1 setzen
+	lcd_curs(63);										// Cursor auf Position setzen
 	lcd_str(Pumpe);									// LCD-Text Pumpe
-	text_loeschen(68, 69);					// LCD-Text Löschen
-	lcd_curs(69);										// Cursor auf Position 1 setzen
+	text_loeschen(68, 69);					// LCD-Text LÃ¶schen
+	lcd_curs(69);										// Cursor auf Position setzen
 	lcd_str(Aus);										// LCD-Text Aus
-	text_loeschen(72, 74);					// LCD-Text Löschen	
+	text_loeschen(72, 74);					// LCD-Text LÃ¶schen	
 }
 
 void abbruch(void)								// Funktion Abbruch	
 {
-	lcd_curs(3);										// Cursor auf Position 1 setzen //In Funktion abbilden!!
-	lcd_str(Wab);										// LCD-Text Abbruch
-	text_loeschen(8, 73);						// LCD-Text Löschen
+	maschine_aus();									// Funktion Maschine aus aufrufen
+	text_loeschen(8, 73);						// LCD-Text LÃ¶schen
 }
 
 void temp_zu_hoch(void)						// Funktion Temperatur zu hoch
 {
-	lcd_curs(63);										// Cursor auf Position 1 setzen //IN Funktion abbilden!!
+	lcd_curs(63);										// Cursor auf Position setzen 
 	lcd_str(temp);									// LCD-Text Temperatur zu hoch
-	text_loeschen(73, 74);					// LCD-Text Löschen
+	text_loeschen(73, 74);					// LCD-Text LÃ¶schen
 }	
 
-void temp_ok(void)						// Funktion Temperatur zu hoch
+void temp_ok(void)								// Funktion Temperatur zu hoch
 {
-	text_loeschen(63, 74);					// LCD-Text Löschen
+	lcd_curs (63);									// Cursor auf Position setzen					
+	text_loeschen(63, 76);					// LCD-Text LÃ¶schen
 }	
-void text_loeschen(unsigned int cours_start, unsigned int cours_end)
+void text_loeschen(unsigned int cours_start, unsigned int cours_end)		// Funktion text loeschen 
 {
-	for (i = cours_start; i < cours_end; i++)
+	for (i = cours_start; i < cours_end; i++)															// For Schleife zÃ¤hlt Variable i hoch
 	{
-		lcd_str(Leer);
+		lcd_str(Leer);																											// LCD-Text " " (Leer)
 	}	
 }	
 
@@ -295,7 +294,7 @@ void waschgang(void)							// Funktion Waschgang
 			break;											// Abschluss
 			
 		case 1:												// Case 1; Wasserzulauf			
-			if (S3 == 1)								// Wenn S3 = 1; Wenn Füllstand S3 erreicht
+			if (S3 == 1)								// Wenn S3 = 1; Wenn FÃ¼llstand S3 erreicht
 			{
 			ventil_zu();								// Ventil zu aufrufen
 			zustand = 2;								// Aufrufen von zustand = 2
@@ -308,9 +307,9 @@ void waschgang(void)							// Funktion Waschgang
 			break;											// Abschluss
 			
 		case 2:												// Case 2; Waschmaschine Vorheizen
-			if (S2 == 0)								// Wenn S2 = 0; Wenn Temperaturwahlhebel auf 60°C
+			if (S2 == 0)								// Wenn S2 = 0; Wenn Temperaturwahlhebel auf 60Â°C
 				{
-					if(S6 == 0)							// Wenn S6 = 0; Wenn Temperatur 60°C nicht erreicht
+					if(S6 == 0)							// Wenn S6 = 0; Wenn Temperatur 60Â°C nicht erreicht
 					{
 					heizung_anschalten();		// Heizung einschalten aufrufen
 					}
@@ -322,7 +321,7 @@ void waschgang(void)							// Funktion Waschgang
 				}
 				else											// Sonst
 				{
-					if(S5 == 0)							// Wenn S5 = 0; Wenn Temperatur 90°C nicht erreicht
+					if(S5 == 0)							// Wenn S5 = 0; Wenn Temperatur 90Â°C nicht erreicht
 					{
 					heizung_anschalten();		// Heizung einschalten aufrufen
 					}
@@ -334,17 +333,17 @@ void waschgang(void)							// Funktion Waschgang
 				}	
 				break;										// Abschluss
 				
-		case 3:												// Case 3; Waschen und Temperatur regeln für 60 Sekunden aktivieren
-			if(zeitabfrage(30))					// Wenn zeitabfrage(30); Funktion Zeitabfrage gibt die tatsächliche Laufzeit von 60 Sekunden an
+		case 3:												// Case 3; Waschen und Temperatur regeln fÃ¼r 60 Sekunden aktivieren
+			if(zeitabfrage(60))					// Wenn zeitabfrage(60); Funktion Zeitabfrage gibt die tatsÃ¤chliche Laufzeit von 60 Sekunden an
 			{	
 				zustand = 4;							// Aufrufen von zustand = 4
 				stoppuhr();								// Stoppuhr aufrufen
 			}
 			else												// Sonst
 			{
-				if (S2 == 0)							// Wenn S2 = 0; Wenn Temperaturwahlhebel auf 60°C
+				if (S2 == 0)							// Wenn S2 = 0; Wenn Temperaturwahlhebel auf 60Â°C
 				{
-					if(S6 == 0)							// Wenn S6 = 0; Wenn Temperatur 60°C nicht erreicht
+					if(S6 == 0)							// Wenn S6 = 0; Wenn Temperatur 60Â°C nicht erreicht
 					{
 					heizung_anschalten();		// Heizung einschalten aufrufen
 					}
@@ -353,9 +352,9 @@ void waschgang(void)							// Funktion Waschgang
 					heizung_ausschalten();	// Heizung ausschalten aufrufen
 					}
 				}	
-				if (S2 == 1)							// Wenn S2 = 0; Wenn Temperaturwahlhebel auf 90°C 
+				if (S2 == 1)							// Wenn S2 = 0; Wenn Temperaturwahlhebel auf 90Â°C 
 				{
-					if(S5 == 0)							// Wenn S5 = 0; Wenn Temperatur 90°C nicht erreicht
+					if(S5 == 0)							// Wenn S5 = 0; Wenn Temperatur 90Â°C nicht erreicht
 					{
 					heizung_anschalten();		// Heizung einschalten aufrufen
 					}
@@ -368,8 +367,8 @@ void waschgang(void)							// Funktion Waschgang
 			motor_anschalten();					// Motor anschalten aufrufen
 			break;											// Abschluss
 			
-		case 4:												// Case 4; Maschinen-Schleudern und Pumpe für 10 Sekunden aktivieren			
-			if(zeitabfrage(10))					// Wenn zeitabfrage(10); Funktion Zeitabfrage gibt die tatsächliche Laufzeit von 10 Sekunden an					
+		case 4:												// Case 4; Maschinen-Schleudern und Pumpe fÃ¼r 10 Sekunden aktivieren			
+			if(zeitabfrage(10))					// Wenn zeitabfrage(10); Funktion Zeitabfrage gibt die tatsÃ¤chliche Laufzeit von 10 Sekunden an					
 			{
 				zustand = 5;							// Aufrufen von zustand = 5
 				stoppuhr();								// Stoppuhr aufrufen
@@ -382,7 +381,7 @@ void waschgang(void)							// Funktion Waschgang
 			break;											// Abschluss
 	
 		case 5:												// Case 5; Maschinen-Schleudern weiterhin aktiv; Pumpe ausschalten 
-			if(zeitabfrage(20))					// Wenn zeitabfrage(20); Funktion Zeitabfrage gibt die tatsächliche Laufzeit von 20 Sekunden an
+			if(zeitabfrage(20))					// Wenn zeitabfrage(20); Funktion Zeitabfrage gibt die tatsÃ¤chliche Laufzeit von 20 Sekunden an
 			{
 				zustand = 6;							// Aufrufen von zustand = 6
 			}
@@ -410,7 +409,7 @@ void waschgang(void)							// Funktion Waschgang
 			break;											// Abschluss
 		
 		case 101:											// Case 101; Ext. Interrupt-Sequenz; Laufzeit Pumpe von 10 Sekunden
-			if(zeitabfrage(10))					// Wenn zeitabfrage(10); Funktion Zeitabfrage gibt die tatsächliche Laufzeit von 10 Sekunden an				
+			if(zeitabfrage(10))					// Wenn zeitabfrage(10); Funktion Zeitabfrage gibt die tatsÃ¤chliche Laufzeit von 10 Sekunden an				
 			{
 				pumpe_ausschalten();			// Pumpe ausschalten aufrufen
 				zustand = 200;						// Aufrufen von zustand = 200
@@ -441,25 +440,25 @@ unsigned int zeitabfrage (unsigned int zielzeit)		// Variable zeitabfrage gibt a
 void reset_timer(void)	// Funktion reset Timer0		
 {
 	TR0 = 1;							// Timer Run
-	ET0 = 1;							// Timer 0 Freigabe
+	ET0 = 1;							// Interrupt Freigabe
 	EA = 1; 							// Globale Freigabe
 }
 
-void interrupt_switch_0 (void) interrupt 0		// Funktion Ext. Interrupt; Ein/Aus Schalten während laufendem Betrieb auf Aus
+void interrupt_switch_0 (void) interrupt 0		// Funktion Ext. Interrupt; Ein/Aus Schalten wÃ¤hrend laufendem Betrieb auf Aus
 {
-	IRCON0 = 0x00;															// Löschen der Flag im IRCON-Register
+	IRCON0 = 0x00;															// LÃ¶schen der Flag im IRCON-Register
 	ende = 1;																		// Variable ende = 1 setzten
 }
 
 void interrupt_timer_0 (void) interrupt 1		// Funktion Timer Interrupt
 {
-	ET0 = 0;																	// Timer 0 Freigabe löschen
+	ET0 = 0;																	// Interrupt Freigabe lÃ¶schen
 	TR0 = 0;																	// Timer 0 stoppt
-	zeitpluseins++;														// zeitpluseins beginnt zu zählen
-	if(zeitpluseins >= 183)										// Wenn zeitpluseins größer gleich 183 Ticks (183 Ticks entspricht 1 Sekunde)
+	zeitpluseins++;														// zeitpluseins beginnt zu zÃ¤hlen
+	if(zeitpluseins >= 183)										// Wenn zeitpluseins grÃ¶ÃŸer gleich 183 Ticks (183 Ticks entspricht 1 Sekunde)
 	{
-		zeitpluseins = 0;												// Setzt zählerpluseins auf 0
-		timer_1++;															// Setzt Zähler für 1 Sekunde auf 0 zurück
+		zeitpluseins = 0;												// Setzt zÃ¤hlerpluseins auf 0
+		timer_1++;															// Setzt ZÃ¤hler fÃ¼r 1 Sekunde auf 0 zurÃ¼ck
 	}
 	reset_timer();														// Reset_Timer aufrufen
 }
@@ -472,10 +471,10 @@ void teiler (void)																			// Funktion Spannungsteiler
 
 void temp_ueberwachung(void)					// Funktion Temperatursensor
 {
-	teiler();														// Teiler aufrufen
+	teiler();														// Teiler aufrufen	
 	if(start == 1)											// Wenn start = 1
-	{		
-		if(temperatur_500 >= 300)					// Wenn temperatur_500 größer gleich 30 °C
+	{
+		if(temperatur_500 >= 300)					// Wenn temperatur_500 grÃ¶ÃŸer gleich 30 Â°C
 		{
 			start = 0;											// Variable start = 0 setzen
 			temp_zu_hoch();									// Temp_zu_Hoch aufrufen						
@@ -483,12 +482,14 @@ void temp_ueberwachung(void)					// Funktion Temperatursensor
 	}	
 	else																// Sonst
 	{
-		if(temperatur_500 <= 270)					// Wenn temperatur_500 kleiner gleich 27°C
+		if(temperatur_500 <= 270)					// Wenn temperatur_500 kleiner gleich 27Â°C
 		{
+			teiler();												// Funktion teiler aufrufen
 			start = 1;											// Variable start = 1 setzen
 			temp_ok();											// Temp_ok aufrufen
-		}	
+		}
 	}
-}
+}	
+
 
 
